@@ -28,7 +28,7 @@ auto PlayerEsp::Draw() -> void {
 							p3.x += w;
 							p4.x -= w;
 
-							DrawHelp::DrawQuadLines(p1, p2, p3, p4, DrawHelp::GetTeamCol(col, 200));
+							DrawHelp::DrawQuadLines(p1, p2, p3, p4, DrawHelp::GetTeamColor(col, 200));
 							break;
 						}
 						case BoxStyle::ThreeD: {
@@ -52,13 +52,13 @@ auto PlayerEsp::Draw() -> void {
 							box.upperTopLeft.y     = static_cast<float>(windowHeight) - box.upperTopLeft.y;
 							box.upperTopRight.y    = static_cast<float>(windowHeight) - box.upperTopRight.y;
 
-							DrawHelp::DrawQuadLines(box.lowerBottomLeft, box.lowerTopLeft, box.lowerTopRight, box.lowerBottomRight, DrawHelp::GetTeamCol(col, 200));
-							DrawHelp::DrawQuadLines(box.upperBottomLeft, box.upperTopLeft, box.upperTopRight, box.upperBottomRight, DrawHelp::GetTeamCol(col, 200));
+							DrawHelp::DrawQuadLines(box.lowerBottomLeft, box.lowerTopLeft, box.lowerTopRight, box.lowerBottomRight, DrawHelp::GetTeamColor(col, 200));
+							DrawHelp::DrawQuadLines(box.upperBottomLeft, box.upperTopLeft, box.upperTopRight, box.upperBottomRight, DrawHelp::GetTeamColor(col, 200));
 
-							bg->AddLine(box.lowerBottomLeft, box.upperBottomLeft, DrawHelp::GetTeamCol(col, 200));
-							bg->AddLine(box.lowerTopLeft, box.upperTopLeft, DrawHelp::GetTeamCol(col, 200));
-							bg->AddLine(box.lowerTopRight, box.upperTopRight, DrawHelp::GetTeamCol(col, 200));
-							bg->AddLine(box.lowerBottomRight, box.upperBottomRight, DrawHelp::GetTeamCol(col, 200));
+							bg->AddLine(box.lowerBottomLeft, box.upperBottomLeft, DrawHelp::GetTeamColor(col, 200));
+							bg->AddLine(box.lowerTopLeft, box.upperTopLeft, DrawHelp::GetTeamColor(col, 200));
+							bg->AddLine(box.lowerTopRight, box.upperTopRight, DrawHelp::GetTeamColor(col, 200));
+							bg->AddLine(box.lowerBottomRight, box.upperBottomRight, DrawHelp::GetTeamColor(col, 200));
 							break;
 						}
 						default: break;
@@ -66,14 +66,14 @@ auto PlayerEsp::Draw() -> void {
 					}
 
 					if (setting.info) {
-						bg->AddRectFilled({ sPoint.x - 60.0f, sPoint.y + 15.0f }, { sPoint.x + 60.0f, sPoint.y + 55.0f }, DrawHelp::GetTeamCol(col, 200), 0);
+						bg->AddRectFilled({ sPoint.x - 60.0f, sPoint.y + 5.0f }, { sPoint.x + 60.0f, sPoint.y + 30.0f }, DrawHelp::GetTeamColor(col, 200), 0);
 						DrawTextWithOutline(bg, { sPoint.x - 57.0f, sPoint.y - 18.0f }, std::format("{} | {}", team, player->name).c_str(), ImColor{ 255,255,255 }, 1, DrawHelp::OutlineSide::All, ImColor{ 0,0,0 });
 					}
 
 					if (setting.line) {
 						auto xy = DrawHelp::BoxScreen::ToVec2(camera->WorldToScreenPoint({ point.x, point.y + 1.6f, point.z }, II::Camera::Eye::Mono));
 						xy.y = static_cast<float>(windowHeight) - xy.y;
-						bg->AddLine({ static_cast<float>(windowWidth) / 2, 0 }, xy, DrawHelp::GetTeamCol(col, 200), 1);
+						bg->AddLine({ static_cast<float>(windowWidth) / 2, 0 }, xy, DrawHelp::GetTeamColor(col, 200), 1);
 					}
 				}
 			}

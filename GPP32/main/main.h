@@ -170,24 +170,110 @@ namespace DrawHelp {
 		if (SameLineAfter_) ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
 	}
 
-	static ImColor GetTeamCol(const int teamId, int a) {
-		switch (teamId) {
-			case 1: {
-				return { 32, 230, 193, a };
-			}
-			case 2: {
-				return { 252, 81, 133, a };
-			}
-			case 3: {
-				return { 234, 125, 198, a };
-			}
-			case 4: {
-				return { 48, 137, 252, a };
-			}
-			case 5: {
-				return { 255, 206, 243, a };
-			}
-			default: ;
-		}
-	}
+	static auto GetTeamColor(const unsigned long teamId, const unsigned long a) -> ImColor {
+        switch (teamId) {
+	        case 0: return {0, 0, 0, a};
+	        case 1: return {133, 151, 21, a};
+	        case 2: return {173, 29, 210, a};
+	        case 3: return {148, 221, 196, a};
+	        case 4: return {118, 25, 57, a};
+	        case 5: return {49, 241, 173, a};
+	        case 6: return {181, 88, 240, a};
+	        case 7: return {147, 151, 50, a};
+	        case 8: return {25, 43, 209, a};
+	        case 9: return {192, 253, 22, a};
+	        case 10: return {142, 78, 72, a};
+	        case 11: return {155, 11, 245, a};
+	        case 12: return {59, 73, 168, a};
+	        case 13: return {99, 93, 222, a};
+	        case 14: return {63, 223, 109, a};
+	        case 15: return {104, 180, 135, a};
+	        case 16: return {154, 170, 205, a};
+	        case 17: return {220, 247, 193, a};
+	        case 18: return {68, 129, 41, a};
+	        case 19: return {8, 27, 64, a};
+	        case 20: return {98, 56, 48, a};
+	        case 21: return {78, 148, 212, a};
+	        case 22: return {17, 208, 222, a};
+	        case 23: return {196, 17, 157, a};
+	        case 24: return {75, 63, 156, a};
+	        case 25: return {70, 187, 239, a};
+	        case 26: return {199, 84, 33, a};
+	        case 27: return {80, 43, 208, a};
+	        case 28: return {239, 90, 244, a};
+	        case 29: return {9, 207, 95, a};
+	        case 30: return {53, 145, 148, a};
+	        case 31: return {54, 127, 137, a};
+	        case 32: return {112, 153, 177, a};
+	        case 33: return {30, 103, 204, a};
+	        case 34: return {17, 84, 3, a};
+	        case 35: return {127, 156, 3, a};
+	        case 36: return {74, 246, 155, a};
+	        case 37: return {30, 237, 103, a};
+	        case 38: return {119, 59, 194, a};
+	        case 39: return {164, 206, 80, a};
+	        case 40: return {116, 249, 198, a};
+	        case 41: return {187, 122, 88, a};
+	        case 42: return {162, 134, 69, a};
+	        case 43: return {179, 147, 232, a};
+	        case 44: return {190, 170, 208, a};
+	        case 45: return {15, 239, 102, a};
+	        case 46: return {232, 28, 0, a};
+	        case 47: return {197, 87, 112, a};
+	        case 48: return {102, 183, 88, a};
+	        case 49: return {38, 87, 232, a};
+	        case 50: return {251, 224, 129, a};
+	        case 51: return {159, 119, 199, a};
+	        case 52: return {251, 230, 193, a};
+	        case 53: return {205, 124, 235, a};
+	        case 54: return {94, 54, 203, a};
+	        case 55: return {166, 117, 86, a};
+	        case 56: return {118, 188, 40, a};
+	        case 57: return {156, 199, 163, a};
+	        case 58: return {36, 207, 244, a};
+	        case 59: return {7, 119, 152, a};
+	        case 60: return {150, 109, 163, a};
+	        case 61: return {65, 92, 23, a};
+	        case 62: return {240, 188, 1, a};
+	        case 63: return {39, 6, 231, a};
+	        case 64: return {123, 7, 186, a};
+	        case 65: return {14, 118, 7, a};
+	        case 66: return {41, 177, 0, a};
+	        case 67: return {72, 3, 136, a};
+	        case 68: return {134, 218, 42, a};
+	        case 69: return {197, 255, 33, a};
+	        case 70: return {124, 153, 103, a};
+	        case 71: return {125, 236, 249, a};
+	        case 72: return {111, 41, 216, a};
+	        case 73: return {162, 115, 100, a};
+	        case 74: return {151, 91, 172, a};
+	        case 75: return {207, 81, 122, a};
+	        case 76: return {167, 23, 19, a};
+	        case 77: return {169, 245, 211, a};
+	        case 78: return {34, 234, 37, a};
+	        case 79: return {176, 144, 217, a};
+	        case 80: return {239, 203, 14, a};
+	        case 81: return {49, 178, 94, a};
+	        case 82: return {1, 146, 33, a};
+	        case 83: return {159, 216, 130, a};
+	        case 84: return {56, 229, 156, a};
+	        case 85: return {177, 118, 13, a};
+	        case 86: return {200, 129, 70, a};
+	        case 87: return {28, 92, 197, a};
+	        case 88: return {190, 37, 45, a};
+	        case 89: return {201, 139, 110, a};
+	        case 90: return {127, 148, 44, a};
+	        case 91: return {206, 213, 105, a};
+	        case 92: return {95, 89, 8, a};
+	        case 93: return {148, 217, 64, a};
+	        case 94: return {151, 99, 58, a};
+	        case 95: return {242, 62, 114, a};
+	        case 96: return {64, 135, 202, a};
+	        case 97: return {43, 59, 95, a};
+	        case 98: return {43, 142, 193, a};
+	        case 99: return {6, 203, 46, a};
+	        case 100: return {162, 91, 30, a};
+	        default:return 0;
+        }
+    }
 };
