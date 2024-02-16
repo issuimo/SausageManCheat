@@ -1,6 +1,5 @@
 ﻿#include "ItemList.h"
-#include "../../../GameDefine/PickItem.h"
-#include "../../../GameDefine/RoleLogic.h"
+#include "../../../GameDefine/PickItem/PickItem.h"
 
 auto ItemList::GetInfo() const -> const GuiInfo& { return *new GuiInfo{ reinterpret_cast<const char*>("物品"), reinterpret_cast<const char*>("列表"), true, false, false }; }
 void ItemList::Draw() { Feature::Draw(); }

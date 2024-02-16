@@ -1,12 +1,12 @@
 ﻿#include "PlayerList.h"
 
-#include "../../../GameDefine/RoleLogic.h"
+#include "../../../GameDefine/Role/Role.h"
 
 auto PlayerList::GetInfo() const -> const GuiInfo& { return *new GuiInfo{ reinterpret_cast<const char*>("玩家"), reinterpret_cast<const char*>("列表"), true, false, false }; }
 void PlayerList::Draw() { Feature::Draw(); }
 void PlayerList::Render() {
-	std::lock_guard lock(RoleLogic::mutex);
-	ImGui::Text(std::format("{} 名玩家", RoleLogic::vector.size()).c_str());
+	std::lock_guard lock(Role::mutex);
+	ImGui::Text(std::format("{} 名玩家", Role::vector.size()).c_str());
 	if (ImGui::BeginTable("PlayerList", 2,
 		ImGuiTableFlags_ScrollX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY |
 		ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV |
@@ -17,11 +17,11 @@ void PlayerList::Render() {
 		ImGui::TableSetupColumn(reinterpret_cast<const char*>(u8"血量"), ImGuiTableColumnFlags_None);
 		ImGui::TableHeadersRow();
 
-		for (const auto& player : RoleLogic::vector) {
+		for (const auto& player : Role::vector) {
 			ImGui::TableNextRow();
 			ImGui::PushID(player);
-			if (ImGui::TableSetColumnIndex(0)) ImGui::Text(std::format("{}", player->name).c_str());
-			if (ImGui::TableSetColumnIndex(1)) ImGui::Text(std::format("{}", player->hp).c_str());
+			if (ImGui::TableSetColumnIndex(0)) ImGui::Text(std::format("{}", player->roleLogic->name).c_str());
+			if (ImGui::TableSetColumnIndex(1)) ImGui::Text(std::format("{}", player->roleLogic->hp).c_str());
 			ImGui::PopID();
 		}
 

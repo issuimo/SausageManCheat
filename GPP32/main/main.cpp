@@ -4,9 +4,6 @@
 #include "../Library/imgui/imgui_impl_dx11.h"
 #include "../Library/imgui/Font.h"
 
-#include "GameDefine/PickItem.h"
-#include "GameDefine/RoleLogic.h"
-
 extern auto ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT;
 
 auto SetStyle() -> void;
@@ -20,16 +17,24 @@ auto Main::Init(HMODULE hModule) -> void {
 
 	// 打开控制台
 	console::StartConsole(L"Console", false);
+	LOG_INFO("注入成功!\n");
 
 	// 初始化
+	LOG_INFO("初始化IL2CPP...!\n");
 	UnityResolve::Init(GetModuleHandleA("GameAssembly.dll"), UnityResolve::Mode::Il2Cpp);
+	LOG_INFO("初始化IL2CPP成功!\n");
 
 	// 初始化功能列表
-	InitFeatures();
+	LOG_INFO("初始化功能列表...!\n");
+	// TODO: 禁用检测修复
+	// InitFeatures();
+	LOG_INFO("初始化功能列表成功!\n");
 
 	// 安装D3D11HOOK
+	LOG_INFO("安装D3D11HOOK...!\n");
 	dx_hook::Hk11::Build([&] {
 		if (!init) {
+			LOG_INFO("初始化ImGui...!\n");
 			tagRECT Rect;
 			GetClientRect(dx_hook::Hk11::GetHwnd(), &Rect);
 			windowWidth = Rect.right - Rect.left;
@@ -60,6 +65,7 @@ auto Main::Init(HMODULE hModule) -> void {
 			ImGui_ImplDX11_Init(dx_hook::Hk11::GetDevice(), dx_hook::Hk11::GetContext());
 
 			// 接管窗口消息
+			LOG_INFO("接管窗口消息...!\n");
 			dx_hook::Hk11::SetWndProc([](const HWND hWnd, const UINT msg, const WPARAM wParam, const LPARAM lParam) -> char {
 				POINT mPos;
 				GetCursorPos(&mPos);
@@ -74,7 +80,7 @@ auto Main::Init(HMODULE hModule) -> void {
 				switch (msg) {
 					case WM_KEYDOWN:
 						// 处理界面显示/隐藏
-						if (wParam == VK_DELETE) {
+						if (wParam == VK_DELETE && !tips) {
 							if (show) show = false;
 							else show      = true;
 						}
@@ -91,12 +97,14 @@ auto Main::Init(HMODULE hModule) -> void {
 
 				return true;
 			});
+			LOG_INFO("接管窗口消息成功!\n");
 
 			SetStyle();
 
 			init = true;
 			show = false;
 			tips = true;
+			LOG_INFO("初始化ImGui成功!\n");
 		}
 
 
@@ -107,7 +115,7 @@ auto Main::Init(HMODULE hModule) -> void {
 		// 主界面
 		if (show) {
 			ImGui::SetNextWindowPos(ImVec2(15, 15));
-			if (ImGui::Begin("TAF By 遂沫(github@issuimo)", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove)) {
+			if (ImGui::Begin("遂沫(github@issuimo)", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove)) {
 				if (ImGui::Button("保存")) {
 					if (std::ofstream o(dllPath + L"cfg.json"); o) {
 						nlohmann::json js;
@@ -125,7 +133,7 @@ auto Main::Init(HMODULE hModule) -> void {
 					}
 				}
 				ImGui::SameLine();
-				if (ImGui::Button("转储存")) void(); //I::DumpToFile("./dump.cs");
+				if (ImGui::Button("转储存")) I::DumpToFile("./dump.cs");
 
 				if (ImGui::BeginTabBar("memList")) {
 					for (const auto& [name, _features] : Feature::features) {
@@ -173,13 +181,15 @@ auto Main::Init(HMODULE hModule) -> void {
 		dx_hook::Hk11::GetContext()->OMSetRenderTargets(1, dx_hook::Hk11::GetTargetView(), nullptr);
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	});
+	LOG_INFO("安装D3D11HOOK成功!\n");
 
 	// 数据更新
+	LOG_INFO("启动数据更新线程...!\n");
 	std::thread([&] {
 		UnityResolve::ThreadAttach();
 		while (true) {
 			Sleep(upDateSpeed);
-			PickItem::Update();
+			//PickItem::Update();
 		}
 	}).detach();
 
@@ -188,9 +198,10 @@ auto Main::Init(HMODULE hModule) -> void {
 		UnityResolve::ThreadAttach();
 		while (true) {
 			Sleep(upDateSpeed);
-			RoleLogic::Update();
+			//Role::Update();
 		}
 	}).detach();
+	LOG_INFO("启动数据更新线程完成!\n");
 
 	// 功能周期调用
 	while (true) {

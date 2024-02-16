@@ -1,11 +1,11 @@
 ﻿#pragma once
-#include "../main.h"
+#include "../../main.h"
 #include "PickItemDataConfig.h"
 #include "PickItemNet.h"
 
-class PickItem : public II::MonoBehaviour {
+class PickItem {
 public:
-	void* _this;
+	II::MonoBehaviour* _this;
 	int checkNum;
 	II::Vector3 nowPoint;
 	bool isPick;
@@ -27,12 +27,12 @@ public:
 					const auto pickItem = new PickItem();
 					if (!IsBadReadPtr(item, 10)) {
 						try {
-							pickItem->_this = item;
+							pickItem->_this    = reinterpret_cast<II::MonoBehaviour*>(item);
 							pickItem->checkNum = pickItem->F<int>("checkNum");
 							pickItem->nowPoint = pickItem->F<II::Vector3>("_nowPint");
-							pickItem->isPick = pickItem->F<bool>("isPick");
-							pickItem->config = PickItemDataConfig::Get(pickItem->F<PickItemDataConfig*>("pickItemData"));
-							pickItem->net = PickItemNet::Get(pickItem->F<PickItemNet*>("MyPickItemNet"));
+							pickItem->isPick   = pickItem->F<bool>("isPick");
+							pickItem->config   = PickItemDataConfig::Get(pickItem->F<PickItemDataConfig*>("pickItemData"));
+							pickItem->net      = PickItemNet::Get(pickItem->F<PickItemNet*>("MyPickItemNet"));
 
 							if (!pickItem->net) throw "";
 							if (!pickItem->config) throw "";

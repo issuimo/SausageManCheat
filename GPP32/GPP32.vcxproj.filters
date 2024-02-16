@@ -92,33 +92,6 @@
     <ClInclude Include="library\UnityResolve.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="library\magic_enum\magic_enum.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="library\magic_enum\magic_enum_all.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="library\magic_enum\magic_enum_containers.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="library\magic_enum\magic_enum_flags.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="library\magic_enum\magic_enum_format.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="library\magic_enum\magic_enum_fuse.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="library\magic_enum\magic_enum_iostream.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="library\magic_enum\magic_enum_switch.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="library\magic_enum\magic_enum_utility.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="library\imgui\Font.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -152,25 +125,19 @@
     <ClInclude Include="library\imgui\imstb_truetype.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="library\detours\detours.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="library\detours\HookManager.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="main\main.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="main\features\player\list\PlayerList.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="main\GameDefine\RoleLogic.h">
+    <ClInclude Include="main\GameDefine\Role\RoleLogic.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="main\GameDefine\InjectionDetector.h">
+    <ClInclude Include="main\GameDefine\AntiCheat\InjectionDetector.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="main\GameDefine\ObscuredCheatingDetector.h">
+    <ClInclude Include="main\GameDefine\AntiCheat\ObscuredCheatingDetector.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="main\features\camera\list\CameraList.h">
@@ -179,10 +146,10 @@
     <ClInclude Include="main\features\player\esp\PlayerEsp.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="main\GameDefine\PickItem.h">
+    <ClInclude Include="main\GameDefine\Pickitem\PickItem.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="main\GameDefine\PickItemDataConfig.h">
+    <ClInclude Include="main\GameDefine\Pickitem\PickItemDataConfig.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="main\features\items\list\ItemList.h">
@@ -191,15 +158,23 @@
     <ClInclude Include="main\features\items\esp\ItemEsp.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="main\GameDefine\PickItemNet.h">
+    <ClInclude Include="main\GameDefine\Pickitem\PickItemNet.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="main\features\setting\setting.h">
       <Filter>头文件</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="library\detours\[x64]detours.lib" />
-    <Library Include="library\detours\[x86]detours.lib" />
+    <ClInclude Include="main\GameDefine\Role\Role.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\Role\RoleControl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AnimatorControl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\BodyPart.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -35,7 +35,9 @@ namespace console {
 		BrightWhite
 	};
 
+	static std::mutex mutex;
 	static auto OutConsole(const OutType type, const std::string& text, const std::string& file, int line) -> void {
+		std::lock_guard lock(mutex);
 		const auto hWnd_ = GetStdHandle(STD_OUTPUT_HANDLE);
 		switch (type) {
 			case Info: SetConsoleTextAttribute(hWnd_, BACKGROUND_INTENSITY | Green * 16);

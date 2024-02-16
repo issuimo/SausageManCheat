@@ -1,5 +1,5 @@
 ﻿/*
- * Update: 2024-1-25 13:00
+ * Update: 2024-2-8 13:00
  * Source: https://github.com/issuimo/UnityResolve.hpp
  * Author: github@issuimo
  */
@@ -59,8 +59,8 @@ public:
 		std::string         file;
 		std::vector<Class*> classes;
 
-		[[nodiscard]] auto Get(const std::string& strClass, const std::string& strNamespace = "*") const -> Class* {
-			for (const auto pClass : classes) if (pClass->name == strClass && strNamespace == "*" ? true : pClass->namespaze == strNamespace) return pClass;
+		[[nodiscard]] auto Get(const std::string& strClass, const std::string& strNamespace = "*", const std::string& strParent = "*") const -> Class* {
+			for (const auto pClass : classes) if ((strNamespace == "*" || pClass->name == strClass) && (pClass->parent == "*" || pClass->parent == strParent)) return pClass;
 			return nullptr;
 		}
 	};
@@ -198,9 +198,7 @@ public:
 			try {
 				if (!badPtr) badPtr = !IsBadCodePtr(static_cast<FARPROC>(function));
 				if (function && badPtr) return reinterpret_cast<Return(UNITY_CALLING_CONVENTION*)(Args...)>(function)(args...);
-			} catch (...) {
-				return Return();
-			}
+			} catch (...) { }
 #else
 			if (function) return reinterpret_cast<Return(UNITY_CALLING_CONVENTION*)(Args...)>(function)(args...);
 #endif
@@ -1336,7 +1334,7 @@ public:
 			}
 
 			template <typename T>
-			auto GetComponentsInChildren() -> Array<T> {
+			auto GetComponentsInChildren() -> Array<T>* {
 				static Method* method;
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Component")->Get<Method>("GetComponentsInChildren");
 				if (method) return method->Invoke<Array<T>*>(this);
@@ -1344,7 +1342,7 @@ public:
 			}
 
 			template <typename T>
-			auto GetComponentsInChildren(Class* pClass) -> Array<T> {
+			auto GetComponentsInChildren(Class* pClass) -> Array<T>* {
 				static Method* method;
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Component")->Get<Method>("GetComponentsInChildren", { "System.Type" });;
 				if (method) return method->Invoke<Array<T>*>(this, pClass->GetType().GetObject());
@@ -1352,7 +1350,7 @@ public:
 			}
 
 			template <typename T>
-			auto GetComponents() -> Array<T> {
+			auto GetComponents() -> Array<T>* {
 				static Method* method;
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Component")->Get<Method>("GetComponents");
 				if (method) return method->Invoke<Array<T>*>(this);
@@ -1360,7 +1358,7 @@ public:
 			}
 
 			template <typename T>
-			auto GetComponents(Class* pClass) -> Array<T> {
+			auto GetComponents(Class* pClass) -> Array<T>* {
 				static Method* method;
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Component")->Get<Method>("GetComponents", { "System.Type" });;
 				if (method) return method->Invoke<Array<T>*>(this, pClass->GetType().GetObject());
@@ -1368,7 +1366,7 @@ public:
 			}
 
 			template <typename T>
-			auto GetComponentsInParent() -> Array<T> {
+			auto GetComponentsInParent() -> Array<T>* {
 				static Method* method;
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Component")->Get<Method>("GetComponentsInParent");
 				if (method) return method->Invoke<Array<T>*>(this);
@@ -1376,7 +1374,7 @@ public:
 			}
 
 			template <typename T>
-			auto GetComponentsInParent(Class* pClass) -> Array<T> {
+			auto GetComponentsInParent(Class* pClass) -> Array<T>* {
 				static Method* method;
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Component")->Get<Method>("GetComponentsInParent", { "System.Type" });;
 				if (method) return method->Invoke<Array<T>*>(this, pClass->GetType().GetObject());
@@ -1713,31 +1711,35 @@ public:
 				throw std::logic_error("nullptr");
 			}
 
-			auto GetComponent() -> Component* {
+			template <typename T>
+			auto GetComponent() -> T {
 				static Method* method;
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("GetComponent");
-				if (method) return method->Invoke<Component*>(this);
+				if (method) return method->Invoke<T>(this);
 				throw std::logic_error("nullptr");
 			}
 
-			auto GetComponent(const Class* type) -> Component* {
+			template <typename T>
+			auto GetComponent(const Class* type) -> T {
 				static Method* method;
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("GetComponent", { "System.Type" });
-				if (method) return method->Invoke<Component*>(this, type->GetType().GetObject());
+				if (method) return method->Invoke<T>(this, type->GetType().GetObject());
 				throw std::logic_error("nullptr");
 			}
 
-			auto GetComponentInChildren(const Class* type) -> Component* {
+			template <typename T>
+			auto GetComponentInChildren(const Class* type) -> T {
 				static Method* method;
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("GetComponentInChildren", { "System.Type" });
-				if (method) return method->Invoke<Component*>(this, type->GetType().GetObject());
+				if (method) return method->Invoke<T>(this, type->GetType().GetObject());
 				throw std::logic_error("nullptr");
 			}
 
-			auto GetComponentInParent(const Class* type) -> Component* {
+			template <typename T>
+			auto GetComponentInParent(const Class* type) -> T {
 				static Method* method;
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("GetComponentInParent", { "System.Type" });
-				if (method) return method->Invoke<Component*>(this, type->GetType().GetObject());
+				if (method) return method->Invoke<T>(this, type->GetType().GetObject());
 				throw std::logic_error("nullptr");
 			}
 
@@ -2007,12 +2009,14 @@ public:
 			}
 		};
 
-		
-	private:
 		template <typename Return, typename... Args>
 		static auto Invoke(const void* address, Args... args) -> Return {
-			if (address != nullptr) return reinterpret_cast<Return(*)(Args...)>(address)(args...);
-			throw std::logic_error("nullptr");
+			static bool badPtr;
+			try {
+				if (!badPtr) badPtr = !IsBadCodePtr(static_cast<FARPROC>(function));
+				if (address != nullptr && badPtr) return reinterpret_cast<Return(*)(Args...)>(address)(args...);
+			} catch (...) { }
+			return Return();
 		}
 	};
 

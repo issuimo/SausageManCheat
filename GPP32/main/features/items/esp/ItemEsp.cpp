@@ -1,5 +1,5 @@
 ﻿#include "ItemEsp.h"
-#include "../../../GameDefine/PickItem.h"
+#include "../../../GameDefine/PickItem/PickItem.h"
 
 auto ItemEsp::GetInfo() const -> const GuiInfo& { return *new GuiInfo{ reinterpret_cast<const char*>("物品"), reinterpret_cast<const char*>("透视"), true, false, true }; }
 void ItemEsp::Draw() {
@@ -7,9 +7,9 @@ void ItemEsp::Draw() {
 		const auto bg = ImGui::GetBackgroundDrawList();
 		std::lock_guard lock(PickItem::mutex);
 		for (const auto& obj : PickItem::vector) {
-			if (obj->net && obj->config) {
+			if (obj && obj->net && obj->config) {
 				try {
-					if (auto sPoint = II::Camera::GetAllCamera()[0]->WorldToScreenPoint(obj->net->syncPoint, II::Camera::Eye::Mono); 
+					if (auto sPoint = II::Camera::GetAllCamera()[0]->WorldToScreenPoint(obj->net->syncPoint, II::Camera::Eye::Mono);
 						sPoint.z > -1 && (sPoint.y < static_cast<float>(windowHeight) && sPoint.y > 0) && (sPoint.z < static_cast<float>(windowWidth) && sPoint.z > 0)) {
 						sPoint.y = static_cast<float>(windowHeight) - sPoint.y;
 						DrawTextWithOutline(bg, { sPoint.x, sPoint.y }, std::format("{}", obj->config->itemName).c_str(), ImColor{ 255,255,0 }, 1, DrawHelp::OutlineSide::All, ImColor{ 0,0,0 });

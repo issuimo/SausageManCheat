@@ -1,9 +1,9 @@
 ﻿#pragma once
-#include "../main.h"
+#include "../../main.h"
 
-class PickItemDataConfig : public II::Object {
+class PickItemDataConfig {
 public:
-	void* _this;
+	II::Object* _this;
 	std::int64_t id;
 	std::string itemName;
 
@@ -19,11 +19,10 @@ public:
 			if (!IsBadReadPtr(ptr, 10)) {
 				const auto ptr2 = new PickItemDataConfig();
 				try {
-					ptr2->_this = ptr;
-					ptr2->id = ptr2->F<std::int64_t>("ItemId");
+					ptr2->_this    = reinterpret_cast<II::Object*>(ptr);
+					ptr2->id       = ptr2->F<std::int64_t>("ItemId");
 					ptr2->itemName = ptr2->F<II::String*>("itemName")->ToString();
-				}
-				catch (...) {
+				} catch (...) {
 					ERROR();
 					delete ptr2;
 					return nullptr;

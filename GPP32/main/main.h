@@ -12,12 +12,10 @@
 #include <map>
 
 #include "../library/json.hpp"
-#include "../library/detours/HookManager.h"
 #include "../library/imgui/imgui.h"
 #include "../library/imgui/imgui_internal.h"
 #include "../library/UnityResolve.hpp"
 #include "../library/imgui/implot.h"
-#include "../library/magic_enum/magic_enum_all.hpp"
 #include "../Library/HotKey.hpp"
 #include "../Library/Console.hpp"
 
@@ -31,7 +29,6 @@ using IT = UnityResolve::Type;
 using IF = UnityResolve::Field;
 using IA = UnityResolve::Assembly;
 using II = UnityResolve::UnityType;
-using H = HookManager;
 
 class Main {
 public:

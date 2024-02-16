@@ -1,9 +1,9 @@
 ﻿#pragma once
-#include "../main.h"
+#include "../../main.h"
 
-class PickItemNet : public II::Object {
+class PickItemNet {
 public:
-	void* _this;
+	II::Object* _this;
 	std::int64_t id;
 	II::Vector3 syncPoint;
 	int bulletNum;
@@ -21,13 +21,12 @@ public:
 			if (!IsBadReadPtr(ptr, 10)) {
 				const auto ptr2 = new PickItemNet();
 				try {
-					ptr2->_this = ptr;
-					ptr2->id = ptr2->F<std::int64_t>("ItemId");
+					ptr2->_this     = reinterpret_cast<II::Object*>(ptr);
+					ptr2->id        = ptr2->F<std::int64_t>("ItemId");
 					ptr2->bulletNum = ptr2->F<int>("BulletNum");
-					ptr2->isClear = ptr2->F<bool>("IsClear");
+					ptr2->isClear   = ptr2->F<bool>("IsClear");
 					ptr2->syncPoint = ptr2->F<II::Vector3>("SyncPoint");
-				}
-				catch (...) {
+				} catch (...) {
 					ERROR();
 					delete ptr2;
 					return nullptr;
