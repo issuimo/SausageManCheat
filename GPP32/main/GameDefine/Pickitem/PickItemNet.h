@@ -1,43 +1,86 @@
 ﻿#pragma once
 #include "../../main.h"
 
-class PickItemNet {
-public:
-	II::Object* _this;
-	std::int64_t id;
-	II::Vector3 syncPoint;
-	int bulletNum;
-	int isClear;
+#include "PickItemDataConfig.h"
 
-	template <typename T>
-	auto F(const std::string& field) -> T {
-		if (auto ptr = reinterpret_cast<T*>(reinterpret_cast<std::uint32_t>(_this) + reinterpret_cast<std::int32_t>(pClass->Get<std::int32_t>(field))); !IsBadReadPtr(ptr, sizeof(T))) return *ptr;
-		return T();
-	}
-
-	static auto Get(PickItemNet* ptr) -> PickItemNet* {
-		if (!pClass) pClass = I::Get("Assembly-CSharp.dll")->Get("PickItemNet");
-		if (pClass) {
-			if (!IsBadReadPtr(ptr, 10)) {
-				const auto ptr2 = new PickItemNet();
-				try {
-					ptr2->_this     = reinterpret_cast<II::Object*>(ptr);
-					ptr2->id        = ptr2->F<std::int64_t>("ItemId");
-					ptr2->bulletNum = ptr2->F<int>("BulletNum");
-					ptr2->isClear   = ptr2->F<bool>("IsClear");
-					ptr2->syncPoint = ptr2->F<II::Vector3>("SyncPoint");
-				} catch (...) {
-					ERROR();
-					delete ptr2;
-					return nullptr;
-				}
-				return ptr2;
-			}
-		}
-		return nullptr;
-	}
-
-	static auto M(const std::string& name, const std::vector<std::string>& args = {}) -> I::Method* { return pClass->Get<I::Method>(name, args); }
-private:
-	inline static I::Class* pClass;
+struct PickItemNet : II::Object {
+	int AutoId;
+	UnityResolve::UnityType::String* ItemSign;
+	char SyncId[0x000008];
+	std::int64_t ItemId;
+	std::int64_t ItemType;
+	int ScorIndex;
+	bool IsClear;
+	char IsClear_[0x000003];
+	UnityResolve::UnityType::Vector3 SyncPoint;
+	UnityResolve::UnityType::Vector3 SyncEulerAngles;
+	UnityResolve::UnityType::Vector3 ServerRota;
+	int PickRoleId;
+	int OldPickRoleId;
+	UnityResolve::UnityType::String* skinSign;
+	bool isMythSkin;
+	char isMythSkin_[0x000003];
+	int IdCardSkinIndex;
+	std::int64_t IdCardSkinId;
+	UnityResolve::UnityType::String* shootSign;
+	bool IsMyStery;
+	char IsMyStery_[0x000003];
+	UnityResolve::UnityType::String* flyEffectName;
+	char weaponEquips[0x000004];
+	int AirThrowIndex;
+	int WP_WeaponId;
+	int _wpWeaponPackIndex;
+	int _UserNum_k__BackingField;
+	int BulletNum;
+	int nowValue;
+	int BaseValue;
+	UnityResolve::UnityType::String* ItemSource;
+	bool IsChangeFlyAni;
+	bool IsEquip;
+	char IsEquip_[0x000002];
+	float PackValue;
+	float EquipHp;
+	float BaseEquipHp;
+	bool IsDiffAdd;
+	char IsDiffAdd_[0x000003];
+	PickItemDataConfig* MyPickItemData;
+	char MySOEquipPart[0x000004];
+	char MySOWeaponControl[0x000004];
+	char MythSkinEffect[0x000004];
+	char MySOElasticWeaponControl[0x000004];
+	char MySOItemData[0x000004];
+	char MySOWepEquipData[0x000004];
+	char MySOHitPart[0x000004];
+	bool IsFirstSort;
+	bool IsAutoPickUp;
+	bool IsChangeWeaponUnCheck;
+	bool isNeedClearItem;
+	bool IsPickCreateNew;
+	char IsPickCreateNew_[0x000003];
+	int pBuffID;
+	char _userWeapon[0x000004];
+	bool notCollectData;
+	char notCollectData_[0x000003];
+	int sportsPartyLevel;
+	char skinChangerCallBack[0x000004];
+	int _Experience_k__BackingField;
+	int _Level_k__BackingField;
+	char _userRole[0x000004];
+	bool _IsPackPackCheck_k__BackingField;
+	bool _IsPackPickCheck_k__BackingField;
+	bool _IsWeaponPicked_k__BackingField;
+	bool _IsInfiniteBullet_k__BackingField;
+	char parent[0x000004];
+	char gameWorld[0x000004];
+	char WeaponEquipManager[0x000004];
+	char itemLoops[0x000004];
+	char OnTimeEventCallBack[0x000004];
+	char itemServer[0x000004];
+	char itemClient[0x000004];
+	float lastFireTime;
+	float seriesFireNum;
+	float currentUpMinRecoil;
+	float currentUpMaxRecoil;
+	int currentMinUpRecoilBulletNum;
+	char PveDataManager[0x000004];
 };

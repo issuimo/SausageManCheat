@@ -28,7 +28,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <InterproceduralOptimization>true</InterproceduralOptimization>
@@ -76,14 +76,13 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;GPP32_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>Default</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <DebugInformationFormat>None</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <Optimization>MaxSpeedHighLevel</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OptimizeForWindowsApplication>true</OptimizeForWindowsApplication>
@@ -91,13 +90,18 @@
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
-      <ControlFlowGuard>Guard</ControlFlowGuard>
-      <FloatingPointModel>Precise</FloatingPointModel>
-      <FloatingPointExceptions>true</FloatingPointExceptions>
-      <GuardEHContMetadata>true</GuardEHContMetadata>
-      <AssemblerOutput>All</AssemblerOutput>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions3</EnableEnhancedInstructionSet>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointExceptions>
+      </FloatingPointExceptions>
+      <GuardEHContMetadata>
+      </GuardEHContMetadata>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <EnableModules>true</EnableModules>
+      <BuildStlModules>true</BuildStlModules>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -105,7 +109,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <SetChecksum>true</SetChecksum>
+      <SetChecksum>false</SetChecksum>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -122,6 +126,7 @@
     <ClCompile Include="library\imgui\implot_demo.cpp" />
     <ClCompile Include="library\imgui\implot_items.cpp" />
     <ClCompile Include="main\features.cpp" />
+    <ClCompile Include="main\features\aim\Aim.cpp" />
     <ClCompile Include="main\features\camera\list\CameraList.cpp" />
     <ClCompile Include="main\features\items\esp\ItemEsp.cpp" />
     <ClCompile Include="main\features\items\list\ItemList.cpp" />
@@ -147,21 +152,22 @@
     <ClInclude Include="library\imgui\imstb_truetype.h" />
     <ClInclude Include="library\json.hpp" />
     <ClInclude Include="library\UnityResolve.hpp" />
+    <ClInclude Include="main\features\aim\Aim.h" />
     <ClInclude Include="main\features\camera\list\CameraList.h" />
     <ClInclude Include="main\features\items\esp\ItemEsp.h" />
     <ClInclude Include="main\features\items\list\ItemList.h" />
     <ClInclude Include="main\features\player\esp\PlayerEsp.h" />
     <ClInclude Include="main\features\setting\setting.h" />
-    <ClInclude Include="main\GameDefine\AnimatorControl.h" />
+    <ClInclude Include="main\GameDefine\Animator\AnimatorControl.h" />
     <ClInclude Include="main\GameDefine\AntiCheat\InjectionDetector.h" />
     <ClInclude Include="main\GameDefine\AntiCheat\ObscuredCheatingDetector.h" />
-    <ClInclude Include="main\GameDefine\BodyPart.h" />
     <ClInclude Include="main\GameDefine\Pickitem\PickItem.h" />
     <ClInclude Include="main\GameDefine\Pickitem\PickItemDataConfig.h" />
     <ClInclude Include="main\GameDefine\Pickitem\PickItemNet.h" />
-    <ClInclude Include="main\GameDefine\Role\RoleControl.h" />
-    <ClInclude Include="main\GameDefine\Role\RoleLogic.h" />
     <ClInclude Include="main\GameDefine\Role\Role.h" />
+    <ClInclude Include="main\GameDefine\Role\RoleControl.h" />
+    <ClInclude Include="main\GameDefine\Role\RoleControlBase.h" />
+    <ClInclude Include="main\GameDefine\Role\RoleLogic.h" />
     <ClInclude Include="main\main.h" />
     <ClInclude Include="main\features\player\list\PlayerList.h" />
   </ItemGroup>

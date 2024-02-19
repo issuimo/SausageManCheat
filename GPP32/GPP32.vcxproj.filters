@@ -75,6 +75,9 @@
     <ClCompile Include="main\features\setting\setting.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="main\features\aim\Aim.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="library\Console.hpp">
@@ -131,9 +134,6 @@
     <ClInclude Include="main\features\player\list\PlayerList.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="main\GameDefine\Role\RoleLogic.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="main\GameDefine\AntiCheat\InjectionDetector.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -167,13 +167,19 @@
     <ClInclude Include="main\GameDefine\Role\Role.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="main\GameDefine\Role\RoleLogic.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="main\GameDefine\Role\RoleControl.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="main\GameDefine\AnimatorControl.h">
+    <ClInclude Include="main\GameDefine\Role\RoleControlBase.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="main\GameDefine\BodyPart.h">
+    <ClInclude Include="main\GameDefine\Animator\AnimatorControl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\features\aim\Aim.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

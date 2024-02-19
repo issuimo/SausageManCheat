@@ -1,39 +1,52 @@
 ﻿#pragma once
 #include "../../main.h"
 
-class PickItemDataConfig {
-public:
-	II::Object* _this;
-	std::int64_t id;
-	std::string itemName;
-
-	template <typename T>
-	auto F(const std::string& field) -> T {
-		if (auto ptr = reinterpret_cast<T*>(reinterpret_cast<std::uint32_t>(_this) + reinterpret_cast<std::int32_t>(pClass->Get<std::int32_t>(field))); !IsBadReadPtr(ptr, sizeof(T))) return *ptr;
-		return T();
-	}
-
-	static auto Get(PickItemDataConfig* ptr) -> PickItemDataConfig* {
-		if (!pClass) pClass = I::Get("Assembly-CSharp.dll")->Get("PickItemDataConfig");
-		if (pClass) {
-			if (!IsBadReadPtr(ptr, 10)) {
-				const auto ptr2 = new PickItemDataConfig();
-				try {
-					ptr2->_this    = reinterpret_cast<II::Object*>(ptr);
-					ptr2->id       = ptr2->F<std::int64_t>("ItemId");
-					ptr2->itemName = ptr2->F<II::String*>("itemName")->ToString();
-				} catch (...) {
-					ERROR();
-					delete ptr2;
-					return nullptr;
-				}
-				return ptr2;
-			}
-		}
-		return nullptr;
-	}
-
-	static auto M(const std::string& name, const std::vector<std::string>& args = {}) -> I::Method* { return pClass->Get<I::Method>(name, args); }
-private:
-	inline static I::Class* pClass;
+struct PickItemDataConfig : II::Object {
+	UnityResolve::UnityType::String* ItemSign;
+	char Index[0x000004];
+	std::int64_t ItemId;
+	UnityResolve::UnityType::String* itemName;
+	char itemName_[0x000004];
+	std::int64_t ItemType;
+	UnityResolve::UnityType::String* itemInfo;
+	int ScorIndex;
+	UnityResolve::UnityType::String* instructionStr;
+	UnityResolve::UnityType::String* PreLoadType;
+	float PackValue;
+	float CircusBallHp;
+	float lowHp;
+	char SOBuffList[0x000004];
+	UnityResolve::UnityType::String* SONoHpBuffList;
+	UnityResolve::UnityType::String* lowHpEffectName;
+	int ItemLevel;
+	bool IsAutoEquip;
+	char IsAutoEquip_[0x000003];
+	UnityResolve::UnityType::String* itemDifficulty;
+	UnityResolve::UnityType::String* itemFireRange;
+	int HasAutoPickItemNum;
+	int HasAutoPickItemDefaultNum;
+	float PickItemAnimMaxY;
+	float PickItemAnimMinY;
+	float PickItemAnimSpeed;
+	float DropPickItemAnimMaxY;
+	float DropPickItemAnimMinY;
+	float DropPickItemAnimSpeed;
+	float ResurrectionPickItemAnimMaxY;
+	float ResurrectionPickItemAnimMinY;
+	float ResurrectionPickItemAnimSpeed;
+	UnityResolve::UnityType::String* PickAudio;
+	UnityResolve::UnityType::String* DropAudio;
+	float AutoCreateTime;
+	float AutoClearTime;
+	float ChangeAnimDropSpeed;
+	float ChangeAnimDropRange;
+	UnityResolve::UnityType::String* PickBuff;
+	bool IsDeadDrop;
+	char IsDeadDrop_[0x000003];
+	UnityResolve::UnityType::String* LimitActiveSkin;
+	UnityResolve::UnityType::String* BulletFireEff;
+	int BulletDecal;
+	int BulletImpact;
+	char IdentitySign[0x000004];
+	UnityResolve::UnityType::String* UserSettingSign;
 };

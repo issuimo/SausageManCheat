@@ -1,7 +1,12 @@
 ﻿#include "CameraList.h"
-auto CameraList::GetInfo() const -> const GuiInfo& { return *new GuiInfo{ reinterpret_cast<const char*>("相机"), reinterpret_cast<const char*>("列表"), true, false, false }; }
+auto CameraList::GetInfo() const -> const GuiInfo& { return *new GuiInfo{ reinterpret_cast<const char*>(u8"相机"), reinterpret_cast<const char*>(u8"列表"), true, false, false }; }
 void CameraList::Draw() { Feature::Draw(); }
 void CameraList::Render() {
+	try {
+		ImGui::Text(std::format("Main: {} | Current: {}", (void*)II::Camera::GetMain(), (void*)II::Camera::GetCurrent()).c_str());
+	} catch (...) {
+			ERROR("")
+	}
 	if (ImGui::BeginTable("CameraList", 2,
 		ImGuiTableFlags_ScrollX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY |
 		ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV |
@@ -20,7 +25,7 @@ void CameraList::Render() {
 				if (ImGui::TableSetColumnIndex(1)) ImGui::Text(std::format("{}", camera->GetDepth()).c_str());
 			}
 			catch (...) {
-				ERROR();
+				ERROR("")
 			}
 			ImGui::PopID();
 		}

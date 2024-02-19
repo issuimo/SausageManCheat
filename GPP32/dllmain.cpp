@@ -14,42 +14,42 @@ auto APIENTRY DllMain(const HMODULE hModule, const DWORD ul_reason_for_call, LPV
 		case DLL_PROCESS_ATTACH: {
 			gHModule = hModule;
 			try {
-				ERROR();
+				ERROR("");
 				if (GetModuleHandle(L"Sausage Man.exe")) throw "";
 			} catch (...) {
 				std::thread([&] {
-					ERROR();
+					ERROR("");
 					crc32 = CheckMemory();
 
 					// ???
 					std::thread([&] {
 						try {
-							ERROR();
+							ERROR("");
 							throw "";
 						}
 						catch (...) {
-							ERROR();
+							ERROR("");
 							std::thread([&] {
-								ERROR();
+								ERROR("");
 								}).detach();
 						}
 					}).detach();
 
 					// 数据库验证
 					std::thread([&] {
-						ERROR();
+						ERROR("");
 					}).detach();
 
 					// ???
 					std::thread([&] {
 						try {
-							ERROR();
+							ERROR("");
 							throw "";
 						}
 						catch (...) {
-							ERROR();
+							ERROR("");
 							std::thread([&] {
-								ERROR();
+								ERROR("");
 							}).detach();
 						}
 					}).detach();
@@ -57,30 +57,30 @@ auto APIENTRY DllMain(const HMODULE hModule, const DWORD ul_reason_for_call, LPV
 					// 校验
 					std::thread([&] {
 						try {
-							ERROR();
+							ERROR("");
 							// ???
 							std::thread([&] {
 								try {
-									ERROR();
+									ERROR("");
 									throw "";
 								}
 								catch (...) {
-									ERROR();
+									ERROR("");
 									std::thread([&] {
-										ERROR();
+										ERROR("");
 										}).detach();
 								}
 							}).detach();
 							// ???
 							std::thread([&] {
 								try {
-									ERROR();
+									ERROR("");
 									throw "";
 								}
 								catch (...) {
-									ERROR();
+									ERROR("");
 									std::thread([&] {
-										ERROR();
+										ERROR("");
 										}).detach();
 								}
 							}).detach();
@@ -88,32 +88,32 @@ auto APIENTRY DllMain(const HMODULE hModule, const DWORD ul_reason_for_call, LPV
 							// ???
 							std::thread([&] {
 								try {
-									ERROR();
+									ERROR("");
 									throw "";
 								}
 								catch (...) {
-									ERROR();
+									ERROR("");
 									std::thread([&] {
-										ERROR();
+										ERROR("");
 										}).detach();
 								}
 							}).detach();
 							// ???
 							std::thread([&] {
 								try {
-									ERROR();
+									ERROR("");
 									throw "";
 								}
 								catch (...) {
-									ERROR();
+									ERROR("");
 									std::thread([&] {
-										ERROR();
+										ERROR("");
 										}).detach();
 								}
 							}).detach();
 							throw "";
 						} catch (...) {
-							ERROR();
+							ERROR("");
 							while (true) {
 								Sleep(5000);
 								if (crc32 != CheckMemory()) {
@@ -137,13 +137,13 @@ auto APIENTRY DllMain(const HMODULE hModule, const DWORD ul_reason_for_call, LPV
 					// ???
 					std::thread([&] {
 						try {
-							ERROR();
+							ERROR("");
 							throw "";
 						}
 						catch (...) {
-							ERROR();
+							ERROR("");
 							std::thread([&] {
-								ERROR();
+								ERROR("");
 								}).detach();
 						}
 					}).detach();
@@ -151,13 +151,13 @@ auto APIENTRY DllMain(const HMODULE hModule, const DWORD ul_reason_for_call, LPV
 					// ???
 					std::thread([&] {
 						try {
-							ERROR();
+							ERROR("");
 							throw "";
 						}
 						catch (...) {
-							ERROR();
+							ERROR("");
 							std::thread([&] {
-								ERROR();
+								ERROR("");
 								}).detach();
 						}
 					}).detach();
@@ -165,13 +165,13 @@ auto APIENTRY DllMain(const HMODULE hModule, const DWORD ul_reason_for_call, LPV
 					// ???
 					std::thread([&] {
 						try {
-							ERROR();
+							ERROR("");
 							throw "";
 						}
 						catch (...) {
-							ERROR();
+							ERROR("");
 							std::thread([&] {
-								ERROR();
+								ERROR("");
 								}).detach();
 						}
 					}).detach();
@@ -180,13 +180,13 @@ auto APIENTRY DllMain(const HMODULE hModule, const DWORD ul_reason_for_call, LPV
 				// ???
 				std::thread([&] {
 					try {
-						ERROR();
+						ERROR("");
 						throw "";
 					}
 					catch (...) {
-						ERROR();
+						ERROR("");
 						std::thread([&] {
-							ERROR();
+							ERROR("");
 							}).detach();
 					}
 				}).detach();
@@ -194,13 +194,13 @@ auto APIENTRY DllMain(const HMODULE hModule, const DWORD ul_reason_for_call, LPV
 				// ???
 				std::thread([&] {
 					try {
-						ERROR();
+						ERROR("");
 						throw "";
 					}
 					catch (...) {
-						ERROR();
+						ERROR("");
 						std::thread([&] {
-							ERROR();
+							ERROR("");
 							}).detach();
 					}
 				}).detach();
@@ -295,12 +295,13 @@ auto CALLBACK EnumFunc(const HWND hWnd, const LPARAM pid) -> BOOL {
 
 extern "C" _declspec(dllexport) auto Inject() -> void {
 	try {
-		ERROR();
+		ERROR("");
 		throw "";
 	} catch (...) {
 		if (const auto pid = GetIdByName(L"Sausage Man.exe")) {
 			EnumWindows(EnumFunc, pid);
-			if (auto lParam = SetWindowsHookExW(WH_GETMESSAGE, HookCallBack, gHModule, idThread)) PostThreadMessageW(idThread, WM_NULL, 0, 0);
+			if (idThread)
+				if (auto lParam = SetWindowsHookExW(WH_GETMESSAGE, HookCallBack, gHModule, idThread)) PostThreadMessageW(idThread, WM_NULL, 0, 0);
 		}
 	}
 }

@@ -9,17 +9,15 @@
 #define WINDOWS_MODE 1 // 如果需要请改为 1 | 1 if you need
 #define ANDROID_MODE 0
 #define LINUX_MODE 0
-/* Never
- * #define MAC_MODE 0
- * #define IOS_MODE 0
- */
+ /* Never
+  * #define MAC_MODE 0
+  * #define IOS_MODE 0
+  */
 #if WINDOWS_MODE || LINUX_MODE
 #include <format>
 #endif
-#include <codecvt>
 #include <fstream>
 #include <iostream>
-#include <locale>
 #include <mutex>
 #include <string>
 #include <unordered_map>
@@ -36,6 +34,8 @@
 #define UNITY_CALLING_CONVENTION __cdecl
 #endif
 #elif ANDROID_MODE || LINUX_MODE
+#include <codecvt>
+#include <locale>
 #include <dlfcn.h>
 #define UNITY_CALLING_CONVENTION
 #endif
@@ -54,19 +54,19 @@ public:
 	};
 
 	struct Assembly final {
-		void*               address;
+		void* address;
 		std::string         name;
 		std::string         file;
 		std::vector<Class*> classes;
 
 		[[nodiscard]] auto Get(const std::string& strClass, const std::string& strNamespace = "*", const std::string& strParent = "*") const -> Class* {
-			for (const auto pClass : classes) if ((strNamespace == "*" || pClass->name == strClass) && (pClass->parent == "*" || pClass->parent == strParent)) return pClass;
+			for (const auto pClass : classes) if (strClass == pClass->name && (strNamespace == "*" || pClass->namespaze == strNamespace) && (strParent == "*" || pClass->parent == strParent)) return pClass;
 			return nullptr;
 		}
 	};
 
 	struct Type final {
-		void*       address;
+		void* address;
 		std::string name;
 		int         size;
 
@@ -77,12 +77,13 @@ public:
 	};
 
 	struct Class final {
-		void*                classinfo;
+		void* classinfo;
 		std::string          name;
 		std::string          parent;
 		std::string          namespaze;
 		std::vector<Field*>  fields;
 		std::vector<Method*> methods;
+		void* objType;
 
 		template <typename RType>
 		auto Get(const std::string& name, const std::vector<std::string>& args = {}) -> RType* {
@@ -91,15 +92,27 @@ public:
 			if constexpr (std::is_same_v<RType, Method>) {
 				for (auto pMethod : methods) {
 					if (pMethod->name == name) {
-						if (pMethod->args.size() == args.size()) {
-							for (size_t index{0}; const auto& typeName : args) if (typeName == "*" || typeName.empty() ? false : pMethod->args[index++]->pType->name != typeName) goto next;
+						if (pMethod->args.size() == 0 && args.size() == 0) {
 							return static_cast<RType*>(pMethod);
 						}
+						if (pMethod->args.size() == args.size()) {
+							size_t index{ 0 };
+							for (size_t i { 0 }; const auto & typeName : args)
+							if (typeName == "*" || typeName.empty() ? true : pMethod->args[i++]->pType->name == typeName) {
+								index++;
+							}
+							if (index == pMethod->args.size()) {
+								return static_cast<RType*>(pMethod);
+							}
+						}
 					}
-				next: continue;
 				}
 
-				if (args.empty()) for (auto pMethod : methods) if (pMethod->name == name) return static_cast<RType*>(pMethod);
+				for (auto pMethod : methods) {
+					if (pMethod->name == name) {
+						return static_cast<RType*>(pMethod);
+					}
+				}
 			}
 			return nullptr;
 		}
@@ -113,10 +126,10 @@ public:
 		[[nodiscard]] auto GetType() const -> Type {
 			if (mode_ == Mode::Il2Cpp) {
 				const auto pUType = Invoke<void*, void*>("il2cpp_class_get_type", classinfo);
-				return {pUType, name, -1};
+				return { pUType, name, -1 };
 			}
 			const auto pUType = Invoke<void*, void*>("mono_class_get_type", classinfo);
-			return {pUType, name, -1};
+			return { pUType, name, -1 };
 		}
 
 		/**
@@ -129,17 +142,15 @@ public:
 		auto FindObjectsByType() -> std::vector<T> {
 			static Method* pMethod;
 
-			if (!pMethod) pMethod = UnityResolve::Get("UnityEngine.CoreModule.dll")->Get("Object")->Get<Method>(mode_ == Mode::Il2Cpp ? "FindObjectsOfType" : "FindObjectsOfTypeAll", {"System.Type"});
+			if (!pMethod) pMethod = UnityResolve::Get("UnityEngine.CoreModule.dll")->Get("Object")->Get<Method>(mode_ == Mode::Il2Cpp ? "FindObjectsOfType" : "FindObjectsOfTypeAll", { "System.Type" });
+			if (!objType) { objType = this->GetType().GetObject(); }
 
-			if (pMethod) {
-				std::vector<T> rs{};
-				auto           array = pMethod->Invoke<UnityType::Array<T>*>(this->GetType().GetObject());
-				rs.reserve(array->max_length);
-				for (auto i = 0; i < array->max_length; i++) rs.push_back(array->At(i));
-				return rs;
+			if (pMethod && objType) {
+				auto array = pMethod->Invoke<UnityType::Array<T>*>(objType);
+				return array->ToVector();
 			}
 
-			throw std::logic_error("FindObjectsOfType nullptr");
+			return std::vector<T>();
 		}
 
 		template <typename T>
@@ -150,13 +161,13 @@ public:
 	};
 
 	struct Field final {
-		void*        fieldinfo;
+		void* fieldinfo;
 		std::string  name;
-		Type*        type;
-		Class*       klass;
+		Type* type;
+		Class* klass;
 		std::int32_t offset; // If offset is -1, then it's thread static
 		bool         static_field;
-		void*        vTable;
+		void* vTable;
 
 		template <typename T>
 		auto SetValue(T* value) const -> void {
@@ -172,23 +183,23 @@ public:
 	};
 
 	struct Method final {
-		void*        address;
+		void* address;
 		std::string  name;
-		Class*       klass;
-		Type*        return_type;
+		Class* klass;
+		Type* return_type;
 		std::int32_t flags;
 		bool         static_function;
-		void*        function;
+		void* function;
 
 		struct Arg {
 			std::string name;
-			Type*       pType;
+			Type* pType;
 		};
 
 		std::vector<Arg*> args;
 
 	private:
-		bool badPtr{false};
+		bool badPtr{ false };
 	public:
 
 		template <typename Return, typename... Args>
@@ -198,7 +209,8 @@ public:
 			try {
 				if (!badPtr) badPtr = !IsBadCodePtr(static_cast<FARPROC>(function));
 				if (function && badPtr) return reinterpret_cast<Return(UNITY_CALLING_CONVENTION*)(Args...)>(function)(args...);
-			} catch (...) { }
+			}
+			catch (...) {}
 #else
 			if (function) return reinterpret_cast<Return(UNITY_CALLING_CONVENTION*)(Args...)>(function)(args...);
 #endif
@@ -212,7 +224,7 @@ public:
 			void* exc{};
 			void* argArray[sizeof...(Args) + 1];
 			if (sizeof...(Args) > 0) {
-				size_t index        = 0;
+				size_t index = 0;
 				((argArray[index++] = static_cast<void*>(&args)), ...);
 			}
 
@@ -220,13 +232,15 @@ public:
 				if constexpr (std::is_same_v<Return, void>) {
 					UnityResolve::Invoke<void*>("il2cpp_runtime_invoke", address, obj, argArray, exc);
 					return;
-				} else return *static_cast<Return*>(UnityResolve::Invoke<void*>("il2cpp_runtime_invoke", address, obj, argArray, exc));
+				}
+				else return *static_cast<Return*>(UnityResolve::Invoke<void*>("il2cpp_runtime_invoke", address, obj, argArray, exc));
 			}
 
 			if constexpr (std::is_same_v<Return, void>) {
 				UnityResolve::Invoke<void*>("mono_runtime_invoke", address, obj, argArray, exc);
 				return;
-			} else return *static_cast<Return*>(UnityResolve::Invoke<void*>("mono_runtime_invoke", address, obj, argArray, exc));
+			}
+			else return *static_cast<Return*>(UnityResolve::Invoke<void*>("mono_runtime_invoke", address, obj, argArray, exc));
 		}
 
 		template <typename Return, typename... Args>
@@ -257,14 +271,15 @@ public:
 	}
 
 	static auto Init(void* hmodule, const Mode mode = Mode::Mono) -> void {
-		mode_    = mode;
+		mode_ = mode;
 		hmodule_ = hmodule;
 
 		if (mode_ == Mode::Il2Cpp) {
 			pDomain = Invoke<void*>("il2cpp_domain_get");
 			Invoke<void*>("il2cpp_thread_attach", pDomain);
 			ForeachAssembly();
-		} else {
+		}
+		else {
 			pDomain = Invoke<void*>("mono_get_root_domain");
 			Invoke<void*>("mono_thread_attach", pDomain);
 			Invoke<void*>("mono_jit_thread_attach", pDomain);
@@ -273,9 +288,9 @@ public:
 
 			if (Get("UnityEngine.dll") && (!Get("UnityEngine.CoreModule.dll") || !Get("UnityEngine.PhysicsModule.dll"))) {
 				// 兼容某些游戏 (如生死狙击2)
-				for (const std::vector<std::string> names = {"UnityEngine.CoreModule.dll", "UnityEngine.PhysicsModule.dll"}; const auto name : names) {
-					const auto ass      = Get("UnityEngine.dll");
-					const auto assembly = new Assembly{.address = ass->address, .name = name, .file = ass->file, .classes = ass->classes};
+				for (const std::vector<std::string> names = { "UnityEngine.CoreModule.dll", "UnityEngine.PhysicsModule.dll" }; const auto name : names) {
+					const auto ass = Get("UnityEngine.dll");
+					const auto assembly = new Assembly{ .address = ass->address, .name = name, .file = ass->file, .classes = ass->classes };
 					UnityResolve::assembly.push_back(assembly);
 				}
 			}
@@ -283,9 +298,8 @@ public:
 	}
 
 #if WINDOWS_MODE || LINUX_MODE /*__cplusplus >= 202002L*/
-	static auto DumpToFile(const std::string& file) -> void {
-		std::ofstream io(file, std::fstream::out);
-
+	static auto DumpToFile(const std::string& path) -> void {
+		std::ofstream io(path + "dump.cs", std::fstream::out);
 		if (!io) return;
 
 		for (const auto& pAssembly : assembly) {
@@ -296,7 +310,7 @@ public:
 				io << std::format("\tAssemblyFile: {} \n", pAssembly->file.empty() ? "" : pAssembly->file);
 				io << std::format("\tclass {}{} ", pClass->name, pClass->parent.empty() ? "" : " : " + pClass->parent);
 				io << "{\n\n";
-				for (const auto& pField : pClass->fields) io << std::format("\t\t{:+#06X} | {}{} {}\n", pField->offset, pField->static_field ? "static " : "", pField->type->name, pField->name);
+				for (const auto& pField : pClass->fields) io << std::format("\t\t{:+#06X} | {}{} {};\n", pField->offset, pField->static_field ? "static " : "", pField->type->name, pField->name);
 				io << "\n";
 				for (const auto& pMethod : pClass->methods) {
 					io << std::format("\t\t[Flags: {:032b}] [ParamsCount: {:04d}] |RVA: {:+#010X}|\n", pMethod->flags, pMethod->args.size(), reinterpret_cast<std::uint64_t>(pMethod->function) - reinterpret_cast<std::uint64_t>(hmodule_));
@@ -315,6 +329,218 @@ public:
 
 		io << '\n';
 		io.close();
+
+		std::ofstream io2(path + "struct.hpp", std::fstream::out);
+		if (!io2) return;
+
+		for (const auto& pAssembly : assembly) {
+			for (const auto& pClass : pAssembly->classes) {
+				io2 << std::format("\tnamespace: {}", pClass->namespaze.empty() ? "" : pClass->namespaze);
+				io2 << "\n";
+				io2 << std::format("\tAssembly: {}\n", pAssembly->name.empty() ? "" : pAssembly->name);
+				io2 << std::format("\tAssemblyFile: {} \n", pAssembly->file.empty() ? "" : pAssembly->file);
+				io2 << std::format("\tstruct {}{} ", pClass->name, pClass->parent.empty() ? "" : " : " + pClass->parent);
+				io2 << "{\n\n";
+
+				for (size_t i = 0; i < pClass->fields.size(); i++) {
+					if (pClass->fields[i]->static_field) {
+						continue;
+					}
+
+					auto field = pClass->fields[i];
+
+					next:
+					if ((i + 1) >= pClass->fields.size()) {
+						io2 << std::format("\t\tchar {}[0x{:06X}];\n", field->name, 0x4);
+						continue;
+					}
+
+					if (pClass->fields[i + 1]->static_field) {
+						i++;
+						goto next;
+					}
+
+					std::string name = field->name;
+					std::replace(name.begin(), name.end(), '<', '_');
+					std::replace(name.begin(), name.end(), '>', '_'); 
+
+					if (field->type->name == "System.Int64") {
+						io2 << std::format("\t\tstd::int64_t {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > 8) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - 8);
+						}
+						continue;
+					}
+
+					if (field->type->name == "System.UInt64") {
+						io2 << std::format("\t\tstd::uint64_t {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > 8) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - 8);
+						}
+						continue;
+					}
+
+					if (field->type->name == "System.Int32") {
+						io2 << std::format("\t\tint {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > 4) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - 4);
+						}
+						continue;
+					}
+
+					if (field->type->name == "System.UInt32") {
+						io2 << std::format("\t\tstd::uint32_t {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > 4) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - 4);
+						}
+						continue;
+					}
+
+					if (field->type->name == "System.Boolean") {
+						io2 << std::format("\t\tbool {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > 1) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - 1);
+						}
+						continue;
+					}
+
+					if (field->type->name == "System.String") {
+						io2 << std::format("\t\tUnityResolve::UnityType::String* {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > sizeof(void*)) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - sizeof(void*));
+						}
+						continue;
+					}
+
+					if (field->type->name == "System.Single") {
+						io2 << std::format("\t\tfloat {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > 4) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - 4);
+						}
+						continue;
+					}
+
+					if (field->type->name == "System.Double") {
+						io2 << std::format("\t\tdouble {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > 8) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - 8);
+						}
+						continue;
+					}
+
+					if (field->type->name == "UnityEngine.Vector3") {
+						io2 << std::format("\t\tUnityResolve::UnityType::Vector3 {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > sizeof(UnityType::Vector3)) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - sizeof(UnityType::Vector3));
+						}
+						continue;
+					}
+
+					if (field->type->name == "UnityEngine.Vector2") {
+						io2 << std::format("\t\tUnityResolve::UnityType::Vector2 {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > sizeof(UnityType::Vector2)) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - sizeof(UnityType::Vector2));
+						}
+						continue;
+					}
+
+					if (field->type->name == "UnityEngine.Vector4") {
+						io2 << std::format("\t\tUnityResolve::UnityType::Vector4 {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > sizeof(UnityType::Vector4)) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - sizeof(UnityType::Vector4));
+						}
+						continue;
+					}
+
+					if (field->type->name == "UnityEngine.GameObject") {
+						io2 << std::format("\t\tUnityResolve::UnityType::GameObject* {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > sizeof(void*)) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - sizeof(void*));
+						}
+						continue;
+					}
+
+					if (field->type->name == "UnityEngine.Transform") {
+						io2 << std::format("\t\tUnityResolve::UnityType::Transform* {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > sizeof(void*)) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - sizeof(void*));
+						}
+						continue;
+					}
+
+					if (field->type->name == "UnityEngine.Animator") {
+						io2 << std::format("\t\tUnityResolve::UnityType::Animator* {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > sizeof(void*)) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - sizeof(void*));
+						}
+						continue;
+					}
+
+					if (field->type->name == "UnityEngine.Physics") {
+						io2 << std::format("\t\tUnityResolve::UnityType::Physics* {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > sizeof(void*)) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - sizeof(void*));
+						}
+						continue;
+					}
+
+					if (field->type->name == "UnityEngine.Component") {
+						io2 << std::format("\t\tUnityResolve::UnityType::Component* {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > sizeof(void*)) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - sizeof(void*));
+						}
+						continue;
+					}
+
+					if (field->type->name == "UnityEngine.Rect") {
+						io2 << std::format("\t\tUnityResolve::UnityType::Rect {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > sizeof(UnityType::Rect)) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - sizeof(UnityType::Rect));
+						}
+						continue;
+					}
+
+					if (field->type->name == "UnityEngine.Quaternion") {
+						io2 << std::format("\t\tUnityResolve::UnityType::Quaternion {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > sizeof(UnityType::Quaternion)) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - sizeof(UnityType::Quaternion));
+						}
+						continue;
+					}
+
+					if (field->type->name == "UnityEngine.Color") {
+						io2 << std::format("\t\tUnityResolve::UnityType::Color {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > sizeof(UnityType::Color)) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - sizeof(UnityType::Color));
+						}
+						continue;
+					}
+
+					if (field->type->name == "UnityEngine.Matrix4x4") {
+						io2 << std::format("\t\tUnityResolve::UnityType::Matrix4x4 {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > sizeof(UnityType::Matrix4x4)) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - sizeof(UnityType::Matrix4x4));
+						}
+						continue;
+					}
+
+					if (field->type->name == "UnityEngine.Rigidbody") {
+						io2 << std::format("\t\tUnityResolve::UnityType::Rigidbody* {};\n", name);
+						if (!pClass->fields[i + 1]->static_field && (pClass->fields[i + 1]->offset - field->offset) > sizeof(void*)) {
+							io2 << std::format("\t\tchar {}_[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset - sizeof(void*));
+						}
+						continue;
+					}
+
+					io2 << std::format("\t\tchar {}[0x{:06X}];\n", name, pClass->fields[i + 1]->offset - field->offset);
+				}
+
+				io2 << "\n";
+				io2 << "\t}\n\n";
+			}
+		}
+		io2 << '\n';
+		io2.close();
 	}
 #endif
 
@@ -356,32 +582,33 @@ private:
 		// 遍历程序集
 		if (mode_ == Mode::Il2Cpp) {
 			size_t     nrofassemblies = 0;
-			const auto assemblies     = Invoke<void**>("il2cpp_domain_get_assemblies", pDomain, &nrofassemblies);
+			const auto assemblies = Invoke<void**>("il2cpp_domain_get_assemblies", pDomain, &nrofassemblies);
 			for (auto i = 0; i < nrofassemblies; i++) {
 				const auto ptr = assemblies[i];
 				if (ptr == nullptr) continue;
-				auto       assembly = new Assembly{.address = ptr};
-				const auto image    = Invoke<void*>("il2cpp_assembly_get_image", ptr);
-				assembly->file      = Invoke<const char*>("il2cpp_image_get_filename", image);
-				assembly->name      = Invoke<const char*>("il2cpp_image_get_name", image);
+				auto       assembly = new Assembly{ .address = ptr };
+				const auto image = Invoke<void*>("il2cpp_assembly_get_image", ptr);
+				assembly->file = Invoke<const char*>("il2cpp_image_get_filename", image);
+				assembly->name = Invoke<const char*>("il2cpp_image_get_name", image);
 				UnityResolve::assembly.push_back(assembly);
 				ForeachClass(assembly, image);
 			}
-		} else {
+		}
+		else {
 			Invoke<void*, void(*)(void* ptr, std::vector<Assembly*>&), std::vector<Assembly*>&>("mono_assembly_foreach",
-			                                                                                    [](void* ptr, std::vector<Assembly*>& v) {
-				                                                                                    if (ptr == nullptr) return;
+				[](void* ptr, std::vector<Assembly*>& v) {
+					if (ptr == nullptr) return;
 
-				                                                                                    const auto assembly = new Assembly{.address = ptr,};
-				                                                                                    const auto image    = Invoke<void*>("mono_assembly_get_image", ptr);
-				                                                                                    assembly->file      = Invoke<const char*>("mono_image_get_filename", image);
-				                                                                                    assembly->name      = Invoke<const char*>("mono_image_get_name", image);
-				                                                                                    assembly->name += ".dll";
-				                                                                                    v.push_back(assembly);
+					const auto assembly = new Assembly{ .address = ptr, };
+					const auto image = Invoke<void*>("mono_assembly_get_image", ptr);
+					assembly->file = Invoke<const char*>("mono_image_get_filename", image);
+					assembly->name = Invoke<const char*>("mono_image_get_name", image);
+					assembly->name += ".dll";
+					v.push_back(assembly);
 
-				                                                                                    ForeachClass(assembly, image);
-			                                                                                    },
-			                                                                                    assembly);
+					ForeachClass(assembly, image);
+				},
+				assembly);
 		}
 	}
 
@@ -394,7 +621,7 @@ private:
 				if (pClass == nullptr) continue;
 				const auto pAClass = new Class();
 				pAClass->classinfo = pClass;
-				pAClass->name      = Invoke<const char*>("il2cpp_class_get_name", pClass);
+				pAClass->name = Invoke<const char*>("il2cpp_class_get_name", pClass);
 				if (const auto pPClass = Invoke<void*>("il2cpp_class_get_parent", pClass)) pAClass->parent = Invoke<const char*>("il2cpp_class_get_name", pPClass);
 				pAClass->namespaze = Invoke<const char*>("il2cpp_class_get_namespace", pClass);
 				assembly->classes.push_back(pAClass);
@@ -411,7 +638,8 @@ private:
 					}
 				} while (i_class);
 			}
-		} else {
+		}
+		else {
 			const void* table = Invoke<void*>("mono_image_get_table_info", image, 2);
 			const auto  count = Invoke<int>("mono_table_info_get_rows", table);
 			for (auto i = 0; i < count; i++) {
@@ -420,7 +648,7 @@ private:
 
 				const auto pAClass = new Class();
 				pAClass->classinfo = pClass;
-				pAClass->name      = Invoke<const char*>("mono_class_get_name", pClass);
+				pAClass->name = Invoke<const char*>("mono_class_get_name", pClass);
 				if (const auto pPClass = Invoke<void*>("mono_class_get_parent", pClass)) pAClass->parent = Invoke<const char*>("mono_class_get_name", pPClass);
 				pAClass->namespaze = Invoke<const char*>("mono_class_get_namespace", pClass);
 				assembly->classes.push_back(pAClass);
@@ -448,24 +676,25 @@ private:
 			void* field;
 			do {
 				if ((field = Invoke<void*>("il2cpp_class_get_fields", pKlass, &iter))) {
-					const auto pField = new Field{.fieldinfo = field, .name = Invoke<const char*>("il2cpp_field_get_name", field), .type = new Type{.address = Invoke<void*>("il2cpp_field_get_type", field)}, .klass = klass, .offset = Invoke<int>("il2cpp_field_get_offset", field), .static_field = false, .vTable = nullptr};
+					const auto pField = new Field{ .fieldinfo = field, .name = Invoke<const char*>("il2cpp_field_get_name", field), .type = new Type{.address = Invoke<void*>("il2cpp_field_get_type", field)}, .klass = klass, .offset = Invoke<int>("il2cpp_field_get_offset", field), .static_field = false, .vTable = nullptr };
 					int        tSize{};
 					pField->static_field = pField->offset <= 0;
-					pField->type->name   = Invoke<const char*>("il2cpp_type_get_name", pField->type->address);
-					pField->type->size   = -1;
+					pField->type->name = Invoke<const char*>("il2cpp_type_get_name", pField->type->address);
+					pField->type->size = -1;
 					klass->fields.push_back(pField);
 				}
 			} while (field);
-		} else {
+		}
+		else {
 			void* iter = nullptr;
 			void* field;
 			do {
 				if ((field = Invoke<void*>("mono_class_get_fields", pKlass, &iter))) {
-					const auto pField = new Field{.fieldinfo = field, .name = Invoke<const char*>("mono_field_get_name", field), .type = new Type{.address = Invoke<void*>("mono_field_get_type", field)}, .klass = klass, .offset = Invoke<int>("mono_field_get_offset", field), .static_field = false, .vTable = nullptr};
+					const auto pField = new Field{ .fieldinfo = field, .name = Invoke<const char*>("mono_field_get_name", field), .type = new Type{.address = Invoke<void*>("mono_field_get_type", field)}, .klass = klass, .offset = Invoke<int>("mono_field_get_offset", field), .static_field = false, .vTable = nullptr };
 					int        tSize{};
 					pField->static_field = pField->offset <= 0;
-					pField->type->name   = Invoke<const char*>("mono_type_get_name", pField->type->address);
-					pField->type->size   = Invoke<int>("mono_type_size", pField->type->address, &tSize);
+					pField->type->name = Invoke<const char*>("mono_type_get_name", pField->type->address);
+					pField->type->size = Invoke<int>("mono_type_size", pField->type->address, &tSize);
 					klass->fields.push_back(pField);
 				}
 			} while (field);
@@ -488,16 +717,17 @@ private:
 					pMethod->flags = Invoke<int>("il2cpp_method_get_flags", method, &fFlags);
 
 					int        tSize{};
-					pMethod->static_function   = pMethod->flags & 0x10;
+					pMethod->static_function = pMethod->flags & 0x10;
 					pMethod->return_type->name = Invoke<const char*>("il2cpp_type_get_name", pMethod->return_type->address);
 					pMethod->return_type->size = -1;
-					pMethod->function          = *static_cast<void**>(method);
+					pMethod->function = *static_cast<void**>(method);
 					klass->methods.push_back(pMethod);
 					const auto argCount = Invoke<int>("il2cpp_method_get_param_count", method);
-					for (auto index = 0; index < argCount; index++) pMethod->args.push_back(new Method::Arg{Invoke<const char*>("il2cpp_method_get_param_name", method, index), new Type{.address = Invoke<void*>("il2cpp_method_get_param", method, index), .name = Invoke<const char*>("il2cpp_type_get_name", Invoke<void*>("il2cpp_method_get_param", method, index)), .size = -1}});
+					for (auto index = 0; index < argCount; index++) pMethod->args.push_back(new Method::Arg{ Invoke<const char*>("il2cpp_method_get_param_name", method, index), new Type{.address = Invoke<void*>("il2cpp_method_get_param", method, index), .name = Invoke<const char*>("il2cpp_type_get_name", Invoke<void*>("il2cpp_method_get_param", method, index)), .size = -1} });
 				}
 			} while (method);
-		} else {
+		}
+		else {
 			void* iter = nullptr;
 			void* method;
 			do {
@@ -511,12 +741,12 @@ private:
 					pMethod->return_type = new Type{ .address = Invoke<void*>("mono_signature_get_return_type", method), };
 					pMethod->flags = Invoke<int>("mono_method_get_flags", method, &fFlags);
 					int        tSize{};
-					pMethod->static_function   = pMethod->flags & 0x10;
+					pMethod->static_function = pMethod->flags & 0x10;
 					pMethod->return_type->name = Invoke<const char*>("mono_type_get_name", pMethod->return_type->address);
 					pMethod->return_type->size = Invoke<int>("mono_type_size", pMethod->return_type->address, &tSize);
 					klass->methods.push_back(pMethod);
 
-					const auto names = new char*[Invoke<int>("mono_signature_get_param_count", signature)];
+					const auto names = new char* [Invoke<int>("mono_signature_get_param_count", signature)];
 					Invoke<void>("mono_method_get_param_names", method, names);
 
 					void* mIter = nullptr;
@@ -525,7 +755,7 @@ private:
 					do {
 						if ((mType = Invoke<void*>("mono_signature_get_params", signature, &mIter))) {
 							int t_size{};
-							pMethod->args.push_back(new Method::Arg{names[iname], new Type{.address = mType, .name = Invoke<const char*>("mono_type_get_name", mType), .size = Invoke<int>("mono_type_size", mType, &t_size)}});
+							pMethod->args.push_back(new Method::Arg{ names[iname], new Type{.address = mType, .name = Invoke<const char*>("mono_type_get_name", mType), .size = Invoke<int>("mono_type_size", mType, &t_size)} });
 							iname++;
 						}
 					} while (mType);
@@ -877,11 +1107,13 @@ public:
 					m_vEuler.x = static_cast<float>(3.1415926) * 0.5F;
 					m_vEuler.y = 2.F * atan2f(y, x);
 					m_vEuler.z = 0.F;
-				} else if (m_fTest < -0.4995F * m_fDist) {
+				}
+				else if (m_fTest < -0.4995F * m_fDist) {
 					m_vEuler.x = static_cast<float>(3.1415926) * -0.5F;
 					m_vEuler.y = -2.F * atan2f(y, x);
 					m_vEuler.z = 0.F;
-				} else {
+				}
+				else {
 					m_vEuler.x = asinf(2.F * (w * x - y * z));
 					m_vEuler.y = atan2f(2.F * w * y + 2.F * z * x, 1.F - 2.F * (x * x + y * y));
 					m_vEuler.z = atan2f(2.F * w * z + 2.F * x * y, 1.F - 2.F * (z * z + x * x));
@@ -976,15 +1208,15 @@ public:
 		};
 
 		struct Rect {
-			float fX,     fY;
+			float fX, fY;
 			float fWidth, fHeight;
 
 			Rect() { fX = fY = fWidth = fHeight = 0.f; }
 
 			Rect(const float f1, const float f2, const float f3, const float f4) {
-				fX      = f1;
-				fY      = f2;
-				fWidth  = f3;
+				fX = f1;
+				fY = f2;
+				fWidth = f3;
 				fHeight = f4;
 			}
 		};
@@ -1003,7 +1235,7 @@ public:
 		};
 
 		struct Matrix4x4 {
-			float m[4][4] = {{0}};
+			float m[4][4] = { {0} };
 
 			Matrix4x4() = default;
 
@@ -1012,11 +1244,11 @@ public:
 
 		struct Object {
 			union {
-				void* klass{nullptr};
+				void* klass{ nullptr };
 				void* vtable;
 			} Il2CppClass;
 
-			struct MonitorData* monitor{nullptr};
+			struct MonitorData* monitor{ nullptr };
 
 			auto GetType() -> CsType* {
 				static Method* method;
@@ -1057,7 +1289,7 @@ public:
 		};
 
 		struct String : Object {
-			int32_t m_stringLength{0};
+			int32_t m_stringLength{ 0 };
 			wchar_t m_firstChar[32]{};
 
 			[[nodiscard]] auto ToString() const -> std::string {
@@ -1095,9 +1327,9 @@ public:
 			struct {
 				std::uintptr_t length;
 				std::int32_t   lower_bound;
-			}* bounds{nullptr};
+			}*bounds{ nullptr };
 
-			std::uintptr_t          max_length{0};
+			std::uintptr_t          max_length{ 0 };
 			__declspec(align(8)) T* vector[32]{};
 
 			auto GetData() -> uintptr_t { return reinterpret_cast<uintptr_t>(&vector); }
@@ -1233,20 +1465,20 @@ public:
 				TValue tValue;
 			};
 
-			Array<int>*    pBuckets;
+			Array<int>* pBuckets;
 			Array<Entry*>* pEntries;
 			int            iCount;
 			int            iVersion;
 			int            iFreeList;
 			int            iFreeCount;
-			void*          pComparer;
-			void*          pKeys;
-			void*          pValues;
+			void* pComparer;
+			void* pKeys;
+			void* pValues;
 
 			auto GetEntry() -> Entry* { return static_cast<Entry*>(pEntries->GetData()); }
 
 			auto GetKeyByIndex(const int iIndex) -> TKey {
-				TKey tKey = {0};
+				TKey tKey = { 0 };
 
 				Entry* pEntry = GetEntry();
 				if (pEntry) tKey = pEntry[iIndex].m_tKey;
@@ -1255,7 +1487,7 @@ public:
 			}
 
 			auto GetValueByIndex(const int iIndex) -> TValue {
-				TValue tValue = {0};
+				TValue tValue = { 0 };
 
 				Entry* pEntry = GetEntry();
 				if (pEntry) tValue = pEntry[iIndex].m_tValue;
@@ -1264,7 +1496,7 @@ public:
 			}
 
 			auto GetValueByKey(const TKey tKey) -> TValue {
-				TValue tValue = {0};
+				TValue tValue = { 0 };
 				for (auto i = 0; i < iCount; i++) if (GetEntry()[i].m_tKey == tKey) tValue = GetEntry()[i].m_tValue;
 				return tValue;
 			}
@@ -1298,14 +1530,14 @@ public:
 
 			static auto Instantiate(UnityObject* original) -> UnityObject* {
 				static Method* method;
-				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Object")->Get<Method>("Instantiate", {"*"});
+				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Object")->Get<Method>("Instantiate", { "*" });
 				if (method) return method->Invoke<UnityObject*>(original);
 				throw std::logic_error("nullptr");
 			}
 
 			static auto Destroy(UnityObject* original) -> void {
 				static Method* method;
-				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Object")->Get<Method>("Destroy", {"*"});
+				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Object")->Get<Method>("Destroy", { "*" });
 				if (method) return method->Invoke<void>(original);
 				throw std::logic_error("nullptr");
 			}
@@ -1428,11 +1660,11 @@ public:
 
 			static auto GetAllCamera() -> std::vector<Camera*> {
 				static Method* method;
-				static Class*  klass;
+				static Class* klass;
 
 				if (!method || !klass) {
-					method = Get("UnityEngine.CoreModule.dll")->Get("Camera")->Get<Method>("GetAllCameras", {"*"});
-					klass  = Get("UnityEngine.CoreModule.dll")->Get("Camera");
+					method = Get("UnityEngine.CoreModule.dll")->Get("Camera")->Get<Method>("GetAllCameras", { "*" });
+					klass = Get("UnityEngine.CoreModule.dll")->Get("Camera");
 				}
 
 				if (method && klass) {
@@ -1453,7 +1685,7 @@ public:
 
 			auto SetDepth(const float depth) -> void {
 				static Method* method;
-				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Camera")->Get<Method>("set_depth", {"*"});
+				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Camera")->Get<Method>("set_depth", { "*" });
 				if (method) return method->Invoke<void>(this, depth);
 			}
 
@@ -1915,27 +2147,26 @@ public:
 		};
 
 		struct MonoBehaviour : Behaviour {
-			void* m_CancellationTokenSource;
 		};
 
 		struct Physics : Object {
 			static auto Linecast(const Vector3& start, const Vector3& end) -> bool {
 				static Method* method;
-				if (!method) method = Get("UnityEngine.PhysicsModule.dll")->Get("Physics")->Get<Method>("Linecast", {"*", "*"});
+				if (!method) method = Get("UnityEngine.PhysicsModule.dll")->Get("Physics")->Get<Method>("Linecast", { "*", "*" });
 				if (method) return method->Invoke<bool>(start, end);
 				throw std::logic_error("nullptr");
 			}
 
 			static auto Raycast(const Vector3& origin, const Vector3& direction, const float maxDistance) -> bool {
 				static Method* method;
-				if (!method) method = Get("UnityEngine.PhysicsModule.dll")->Get("Physics")->Get<Method>("Raycast", {"*", "*", "*"});
+				if (!method) method = Get("UnityEngine.PhysicsModule.dll")->Get("Physics")->Get<Method>("Raycast", { "*", "*", "*" });
 				if (method) return method->Invoke<bool>(origin, direction, maxDistance);
 				throw std::logic_error("nullptr");
 			}
 
 			static auto IgnoreCollision(Collider* collider1, Collider* collider2) -> void {
 				static Method* method;
-				if (!method) method = Get("UnityEngine.PhysicsModule.dll")->Get("Physics")->Get<Method>("IgnoreCollision1", {"*", "*"});
+				if (!method) method = Get("UnityEngine.PhysicsModule.dll")->Get("Physics")->Get<Method>("IgnoreCollision1", { "*", "*" });
 				if (method) return method->Invoke<void>(collider1, collider2);
 				throw std::logic_error("nullptr");
 			}
@@ -2011,19 +2242,27 @@ public:
 
 		template <typename Return, typename... Args>
 		static auto Invoke(const void* address, Args... args) -> Return {
+#if WINDOWS_MODE
 			static bool badPtr;
 			try {
-				if (!badPtr) badPtr = !IsBadCodePtr(static_cast<FARPROC>(function));
+				if (!badPtr) badPtr = !IsBadCodePtr(static_cast<FARPROC>(address));
 				if (address != nullptr && badPtr) return reinterpret_cast<Return(*)(Args...)>(address)(args...);
-			} catch (...) { }
+			}
+			catch (...) {}
+#elif
+			try {
+				if (address != nullptr) return reinterpret_cast<Return(*)(Args...)>(address)(args...);
+			}
+			catch (...) {}
+#endif
 			return Return();
 		}
 	};
 
 private:
 	inline static Mode                                   mode_{};
-	inline static void*									 hmodule_;
+	inline static void* hmodule_;
 	inline static std::unordered_map<std::string, void*> address_{};
-	inline static void*                                  pDomain{};
+	inline static void* pDomain{};
 };
 #endif // UNITYRESOLVE_HPP

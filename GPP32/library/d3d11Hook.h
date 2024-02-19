@@ -120,7 +120,6 @@ namespace dx_hook {
 		static auto GetDevice() -> ID3D11Device* { return gDevice; }
 		static auto GetSwapChain() -> IDXGISwapChain* { return gSwapChain; }
 		static auto GetContext() -> ID3D11DeviceContext* { return gContext; }
-		static auto GetTargetView() -> ID3D11RenderTargetView* const * { return &gTargetView; }
 
 	private:
 		inline static bool init{false};
@@ -134,7 +133,6 @@ namespace dx_hook {
 		inline static ID3D11Device*           gDevice{};
 		inline static IDXGISwapChain*         gSwapChain{};
 		inline static ID3D11DeviceContext*    gContext{};
-		inline static ID3D11RenderTargetView* gTargetView{};
 		inline static IDXGISwapChainPresent   oPresent{};
 		inline static uintptr_t*              vmt{};
 
@@ -146,10 +144,6 @@ namespace dx_hook {
 					DXGI_SWAP_CHAIN_DESC sd;
 					a->GetDesc(&sd);
 					hWnd = sd.OutputWindow;
-					ID3D11Texture2D* pBackBuffer{};
-					a->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<LPVOID*>(&pBackBuffer));
-					gDevice->CreateRenderTargetView(pBackBuffer, nullptr, &gTargetView);
-					pBackBuffer->Release();
 					init = true;
 				}
 			}

@@ -1,67 +1,57 @@
-﻿#pragma once
+#pragma once
 #include "../../main.h"
-#include "../AnimatorControl.h"
-#include "../BodyPart.h"
 
-class RoleControl : II::MonoBehaviour {
-public:
-	RoleControl* _this;
-	float height;
-	float radius;
+#include "RoleControlBase.h"
+#include "../Animator/AnimatorControl.h"
+
+struct RoleControl : RoleControlBase {
 	AnimatorControl* animatorControl;
-	BodyPart* bodyPart;
-
-	template <typename T>
-	auto F(const std::string& field) -> T {
-		if (auto ptr = reinterpret_cast<T*>(reinterpret_cast<std::uint32_t>(_this) + reinterpret_cast<std::int32_t>(pClass->Get<std::int32_t>(field))); !IsBadReadPtr(ptr, sizeof(T))) return *ptr;
-		return T();
-	}
-
-	template <typename T>
-	auto BF(const std::string& field) -> T {
-		if (auto ptr = reinterpret_cast<T*>(reinterpret_cast<std::uint32_t>(_this) + reinterpret_cast<std::int32_t>(pBClass->Get<std::int32_t>(field))); !IsBadReadPtr(ptr, sizeof(T))) return *ptr;
-		return T();
-	}
-
-	static auto Get(RoleControl* player) -> RoleControl* {
-		if (!pClass || !pBClass) {
-			pClass = I::Get("Assembly-CSharp.dll")->Get("RoleControl");
-			pBClass = I::Get("Assembly-CSharp.dll")->Get("RoleControlBase");
-		}
-
-		if (pClass && player) {
-			const auto role = new RoleControl();
-			if (!IsBadReadPtr(player, 10)) {
-				try {
-					role->_this = player;
-					role->height = role->BF<float>("roleSizeHeight");
-					role->radius = role->BF<float>("roleSizeRadius");
-					role->animatorControl = AnimatorControl::Get(role->F<AnimatorControl*>("animatorControl"));
-					role->bodyPart = BodyPart::Get(role->F<BodyPart*>("myHitType"));
-
-					if (!role->animatorControl || !role->bodyPart) throw "";
-
-					return role;
-				}
-				catch (...) {
-					ERROR()
-					delete role->animatorControl;
-					delete role->bodyPart;
-					delete role;
-				}
-			}
-		}
-		return nullptr;
-	}
-
-	auto Del() const -> void {
-		delete animatorControl;
-		delete bodyPart;
-	}
-
-	static auto M(const std::string& name, const std::vector<std::string>& args = {}) -> I::Method* { return pClass->Get<I::Method>(name, args); }
-	static auto BM(const std::string& name, const std::vector<std::string>& args = {}) -> I::Method* { return pBClass->Get<I::Method>(name, args); }
-private:
-	inline static I::Class* pClass;
-	inline static I::Class* pBClass;
+	char xiaoChangChangAnim[0x000004];
+	float h_moveDir;
+	float v_moveDir;
+	float y_camRot;
+	float x_camRot;
+	UnityResolve::UnityType::Transform* BodyY;
+	UnityResolve::UnityType::Transform* Body;
+	UnityResolve::UnityType::Transform* HandIKTarget;
+	UnityResolve::UnityType::Transform* PoleTarget;
+	char _mySOGameSetting[0x000004];
+	char myHitType[0x000004];
+	std::int64_t animPlayerId;
+	bool isClearAnimToPool;
+	char isClearAnimToPool_[0x000003];
+	float delayResetCarAniStateTime;
+	float currentDelayResetCarAniStateTime;
+	float delayTime;
+	char isShowXiaoChangChang[0x000004];
+	UnityResolve::UnityType::Vector3 ikTargetPoint;
+	UnityResolve::UnityType::Vector3 poleTagetPoint;
+	bool isPlayColliderSizeAnim;
+	char isPlayColliderSizeAnim_[0x000003];
+	float driveHAccel;
+	float driveHDamping;
+	float driveHAmount;
+	float flyVertical;
+	float flyHorizontal;
+	float flyAccelNormalizedVertical;
+	float flyAccelNormalizedHorizontal;
+	float flyDampingNormalized;
+	float flyAngleX;
+	float flySpeedDown;
+	float flySpeedForward;
+	UnityResolve::UnityType::Vector3 flySpeedLocal;
+	UnityResolve::UnityType::Vector3 HookFlyToward;
+	bool lastStatus;
+	bool IsFlyEntered;
+	bool isOpenParachute;
+	bool isSendFlyHigh;
+	UnityResolve::UnityType::Vector3 headPoint;
+	bool preIsHoldOn;
+	bool preIsDraw;
+	char preIsDraw_[0x000002];
+	UnityResolve::UnityType::GameObject* paoKuRoll;
+	char paokuRollState[0x000004];
+	UnityResolve::UnityType::GameObject* snowMan;
+	char snowManState[0x000004];
+	char appendObMatObMat[0x000004];
 };

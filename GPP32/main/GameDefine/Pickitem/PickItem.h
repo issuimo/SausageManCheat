@@ -3,67 +3,80 @@
 #include "PickItemDataConfig.h"
 #include "PickItemNet.h"
 
-class PickItem {
+class PickItem : II::MonoBehaviour {
 public:
-	II::MonoBehaviour* _this;
-	int checkNum;
-	II::Vector3 nowPoint;
+	PickItemDataConfig* pickItemData;
+	UnityResolve::UnityType::GameObject* ItemObj;
+	UnityResolve::UnityType::Transform* _myTransform;
+	UnityResolve::UnityType::GameObject* myGameObj;
+	int _autoItemId;
+	bool _isClear;
+	bool _isCanPick;
+	bool _isAddEffect;
+	bool isFlySKy;
+	UnityResolve::UnityType::Vector3 _nowPint;
+	PickItemNet* MyPickItemNet;
+	char _MyPickItemHit_k__BackingField[0x000004];
+	bool _IsSetRole_k__BackingField;
+	char _IsSetRole_k__BackingField_[0x000003];
+	int _MapIndexSign_k__BackingField;
+	UnityResolve::UnityType::Vector3 _ChildStartPos_k__BackingField;
+	UnityResolve::UnityType::Transform* _ChildParentTransForm_k__BackingField;
+	UnityResolve::UnityType::String* _effectName;
+	UnityResolve::UnityType::GameObject* _effectObj;
+	char gameWorld[0x000004];
 	bool isPick;
-	PickItemDataConfig* config;
-	PickItemNet* net;
-
-	template <typename T>
-	auto F(const std::string& field) -> T {
-		if (auto ptr = reinterpret_cast<T*>(reinterpret_cast<std::uint32_t>(_this) + reinterpret_cast<std::int32_t>(pClass->Get<std::int32_t>(field))); !IsBadReadPtr(ptr, sizeof(T))) return *ptr;
-		return T();
-	}
+	char isPick_[0x000003];
+	char clock[0x000004];
+	UnityResolve::UnityType::GameObject* MySkin;
+	UnityResolve::UnityType::String* _skinSign;
+	char myCircusBallSkin[0x000004];
+	char hitList[0x000004];
+	int checkNum;
+	bool _isUp;
+	char _isUp_[0x000003];
+	UnityResolve::UnityType::Vector3 _jumpPoint;
+	float _jumpDeplay;
+	UnityResolve::UnityType::Vector3 _startPoint;
+	UnityResolve::UnityType::Vector3 _endPoint;
+	float upSpeed;
+	float leftSpeed;
+	float forwardSpeed;
+	UnityResolve::UnityType::Vector3 addVec3;
+	bool isGetAniInfo;
+	bool _isStartFlyEvent;
+	char _isStartFlyEvent_[0x000002];
+	UnityResolve::UnityType::String* FlyEffectName;
+	UnityResolve::UnityType::GameObject* flyEffect;
+	float _nowSpeed;
+	float _addSpeed;
+	float _maxSpeed;
+	float _minSpeed;
+	bool isNeedAddSize;
+	bool _isAddLowHpEffect;
+	char _isAddLowHpEffect_[0x000002];
+	UnityResolve::UnityType::String* _lowHpEffectName;
+	UnityResolve::UnityType::GameObject* _lowHpEffectObj;
+	char AnimCollider[0x000004];
 
 	static auto Update() -> void {
 		if (!pClass) pClass = I::Get("Assembly-CSharp.dll")->Get("PickItem");
-		try {
-			if (pClass) {
-				std::vector<PickItem*> temp;
+		if (pClass) {
+			std::vector<PickItem*> temp;
+			try {
 				for (const auto item : pClass->FindObjectsByType<PickItem*>()) {
-					const auto pickItem = new PickItem();
-					if (!IsBadReadPtr(item, 10)) {
-						try {
-							pickItem->_this    = reinterpret_cast<II::MonoBehaviour*>(item);
-							pickItem->checkNum = pickItem->F<int>("checkNum");
-							pickItem->nowPoint = pickItem->F<II::Vector3>("_nowPint");
-							pickItem->isPick   = pickItem->F<bool>("isPick");
-							pickItem->config   = PickItemDataConfig::Get(pickItem->F<PickItemDataConfig*>("pickItemData"));
-							pickItem->net      = PickItemNet::Get(pickItem->F<PickItemNet*>("MyPickItemNet"));
-
-							if (!pickItem->net) throw "";
-							if (!pickItem->config) throw "";
-							temp.push_back(pickItem);
-						} catch (const char* str) {
-							delete pickItem->config;
-							delete pickItem->net;
-							delete pickItem;
-						} catch (...) {
-							ERROR();
-							delete pickItem->config;
-							delete pickItem->net;
-							delete pickItem;
-						}
+					if (!IsBadReadPtr(item, sizeof(PickItem)) && !IsBadReadPtr(item->MyPickItemNet, sizeof(PickItemNet)) && !IsBadReadPtr(item->pickItemData, sizeof(PickItemDataConfig))) {
+						temp.push_back(item);
 					}
 				}
-				std::lock_guard lock(mutex);
-				for (const auto pickItem : vector) {
-					delete pickItem->config;
-					delete pickItem->net;
-					delete pickItem;
-				};
-				vector = temp;
 			}
-		}
-		catch (...) {
-			ERROR();
+			catch (...) {
+				ERROR("PickItem->FindObjectsByType")
+			}
+			std::lock_guard lock(mutex);
+			vector = temp;
 		}
 	}
-
-	static auto M(const std::string& name, const std::vector<std::string>& args = {}) -> I::Method* { return pClass->Get<I::Method>(name, args); }
 
 	inline static std::mutex mutex;
 	inline static std::vector<PickItem*> vector;

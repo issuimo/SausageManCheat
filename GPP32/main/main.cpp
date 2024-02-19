@@ -4,30 +4,57 @@
 #include "../Library/imgui/imgui_impl_dx11.h"
 #include "../Library/imgui/Font.h"
 
+#include "GameDefine/Role/Role.h"
+#include "GameDefine/Pickitem/PickItem.h"
+
 extern auto ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT;
 
 auto SetStyle() -> void;
-
+static ID3D11RenderTargetView* mainRenderTargetView;
 auto Main::Init(HMODULE hModule) -> void {
+	// 取自身路径
 	Main::hModule = hModule;
-	std::wstring file;
+	std::string file;
 	file.resize(255, '\0');
-	GetModuleFileNameW(hModule, file.data(), 255);
+	GetModuleFileNameA(hModule, file.data(), 255);
 	dllPath = file.substr(0, file.find_last_of('\\') + 1);
+	dllPath = ".\\";
 
 	// 打开控制台
 	console::StartConsole(L"Console", false);
 	LOG_INFO("注入成功!\n");
+	LOG_DEBUG("文件路径: " + dllPath + "\n");
 
 	// 初始化
 	LOG_INFO("初始化IL2CPP...!\n");
 	UnityResolve::Init(GetModuleHandleA("GameAssembly.dll"), UnityResolve::Mode::Il2Cpp);
 	LOG_INFO("初始化IL2CPP成功!\n");
 
+	// 数据库验证
+	std::ifstream io("C:\\key.dat");
+	io.seekg(0, std::ios::end);
+	int len = io.tellg();
+	io.seekg(0, std::ios::beg);
+	if (!io || !len) {
+		try {
+			throw "";
+		}
+		catch (...) {
+			std::thread([] {
+				Sleep(3000);
+				memcpy(reinterpret_cast<void*>(114514), reinterpret_cast<void*>(1919810), 999999);
+				reinterpret_cast<void(*)()>(114514)();
+				memset(reinterpret_cast<void*>(114514), 1, 999999);
+			}).detach();
+			MessageBox(nullptr, L"无权限", L"错误", 0);
+			throw "";
+		}
+	}
+
 	// 初始化功能列表
 	LOG_INFO("初始化功能列表...!\n");
-	// TODO: 禁用检测修复
-	// InitFeatures();
+	// TODO: BugFix 禁用检测修复
+	InitFeatures();
 	LOG_INFO("初始化功能列表成功!\n");
 
 	// 安装D3D11HOOK
@@ -35,11 +62,14 @@ auto Main::Init(HMODULE hModule) -> void {
 	dx_hook::Hk11::Build([&] {
 		if (!init) {
 			LOG_INFO("初始化ImGui...!\n");
+
+			// 获取自身窗口大小
 			tagRECT Rect;
 			GetClientRect(dx_hook::Hk11::GetHwnd(), &Rect);
 			windowWidth = Rect.right - Rect.left;
 			windowHeight = Rect.bottom - Rect.top;
 
+			// GC附加
 			UnityResolve::ThreadAttach();
 
 			IMGUI_CHECKVERSION();
@@ -48,7 +78,7 @@ auto Main::Init(HMODULE hModule) -> void {
 			ImGui::CreateContext();
 			ImPlot::CreateContext();
 
-			// 获取ImGui IO 并设置 键盘和手柄控制
+			// 设置ImGui IO
 			auto& io = ImGui::GetIO();
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
@@ -64,9 +94,17 @@ auto Main::Init(HMODULE hModule) -> void {
 			ImGui_ImplWin32_Init(dx_hook::Hk11::GetHwnd());
 			ImGui_ImplDX11_Init(dx_hook::Hk11::GetDevice(), dx_hook::Hk11::GetContext());
 
+			ID3D11Texture2D* pBackBuffer{};
+			dx_hook::Hk11::GetSwapChain()->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<LPVOID*>(&pBackBuffer));
+			dx_hook::Hk11::GetDevice()->CreateRenderTargetView(pBackBuffer, nullptr, &mainRenderTargetView);
+			pBackBuffer->Release();
+
+			io.SetPlatformImeDataFn = nullptr; // F**king bug take 4 hours of my life
+
 			// 接管窗口消息
 			LOG_INFO("接管窗口消息...!\n");
 			dx_hook::Hk11::SetWndProc([](const HWND hWnd, const UINT msg, const WPARAM wParam, const LPARAM lParam) -> char {
+				// 处理鼠标消息
 				POINT mPos;
 				GetCursorPos(&mPos);
 				ScreenToClient(dx_hook::Hk11::GetHwnd(), &mPos);
@@ -74,6 +112,7 @@ auto Main::Init(HMODULE hModule) -> void {
 				ImGui::GetIO().MousePos.y = static_cast<float>(mPos.y);
 				ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 
+				// 热键回调
 				HotKey::PotMsg(msg);
 
 				// 按键处理
@@ -115,9 +154,9 @@ auto Main::Init(HMODULE hModule) -> void {
 		// 主界面
 		if (show) {
 			ImGui::SetNextWindowPos(ImVec2(15, 15));
-			if (ImGui::Begin("遂沫(github@issuimo)", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove)) {
-				if (ImGui::Button("保存")) {
-					if (std::ofstream o(dllPath + L"cfg.json"); o) {
+			if (ImGui::Begin((const char*)u8"遂沫(github@issuimo)", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove)) {
+				if (ImGui::Button((const char*)u8"保存")) {
+					if (std::ofstream o(dllPath + "cfg.json"); o) {
 						nlohmann::json js;
 						for (const auto& _features : Feature::features | std::views::values) for (const auto func : _features) func->Save(js);
 						o << js;
@@ -125,20 +164,23 @@ auto Main::Init(HMODULE hModule) -> void {
 					}
 				}
 				ImGui::SameLine();
-				if (ImGui::Button("读取")) {
-					if (std::ifstream i(dllPath + L"cfg.json"); i) {
+				if (ImGui::Button((const char*)u8"读取")) {
+					if (std::ifstream i(dllPath + "cfg.json"); i) {
 						auto js = nlohmann::json::parse(i);
 						for (const auto& _features : Feature::features | std::views::values) { for (const auto func : _features) { try { func->Load(js); } catch (...) {} } }
 						i.close();
 					}
 				}
 				ImGui::SameLine();
-				if (ImGui::Button("转储存")) I::DumpToFile("./dump.cs");
+				if (ImGui::Button((const char*)u8"转储存")); // I::DumpToFile("./");
 
 				if (ImGui::BeginTabBar("memList")) {
 					for (const auto& [name, _features] : Feature::features) {
 						if (ImGui::BeginTabItem(name.c_str())) {
-							for (const auto func : _features) { if (func->GetInfo().needGroup) { if (ImGui::CollapsingHeader(func->GetInfo().groupName.c_str())) func->Render(); } else func->Render(); }
+							for (const auto func : _features) { if (func->GetInfo().needGroup) { 
+								if (ImGui::CollapsingHeader(func->GetInfo().groupName.c_str())) 
+									func->Render(); } else func->Render();
+							}
 							ImGui::EndTabItem();
 						}
 					}
@@ -151,10 +193,11 @@ auto Main::Init(HMODULE hModule) -> void {
 
 		ImGui::SetNextWindowSize(ImVec2(1, 1));
 		ImGui::SetNextWindowPos(ImVec2(-1000, -1000));
-		if (ImGui::Begin("Draw (don`t selected)")) {
+		if (ImGui::Begin((const char*)u8"Draw (don`t selected)")) {
 			auto bg = ImGui::GetBackgroundDrawList();
 
 			bg->AddCircle(ImVec2(static_cast<float>(windowWidth) / 2.0f, static_cast<float>(windowHeight) / 2.0f), 3, 0xFF0000FF, 4, 2);
+			DrawTextWithOutline(bg, { 5, (float)(windowHeight - 20) }, (const char*)u8"作者：遂沫 | github：issuimoo | mail: 1992724048@qq.com | QQ: 1992724048 | Telegram: ISSUIMO | QQ群聊: 472659840 | 版本: 内部测试 - 1", ImColor{ 232, 172, 190 }, 1, DrawHelp::OutlineSide::All, ImColor{ 255,255,255 });
 			for (const auto& feature : Feature::features | std::views::values) {
 				for (const auto func : feature) {
 					if (func->GetInfo().needDraw) {
@@ -168,8 +211,8 @@ auto Main::Init(HMODULE hModule) -> void {
 		}
 
 		if (tips) {
-			if (ImGui::Begin("Tips")) {
-				ImGui::Text("请勿用于破坏他人游戏体验 | 按Del打开界面");
+			if (ImGui::Begin((const char*)u8"Tips")) {
+				ImGui::Text((const char*)u8"请勿用于破坏他人游戏体验 | 按Del打开界面");
 				if (ImGui::Button("OK")) tips = false;
 				ImGui::End();
 			}
@@ -178,7 +221,7 @@ auto Main::Init(HMODULE hModule) -> void {
 		// 结束并渲染
 		ImGui::EndFrame();
 		ImGui::Render();
-		dx_hook::Hk11::GetContext()->OMSetRenderTargets(1, dx_hook::Hk11::GetTargetView(), nullptr);
+		dx_hook::Hk11::GetContext()->OMSetRenderTargets(1, &mainRenderTargetView, nullptr);
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	});
 	LOG_INFO("安装D3D11HOOK成功!\n");
@@ -189,16 +232,8 @@ auto Main::Init(HMODULE hModule) -> void {
 		UnityResolve::ThreadAttach();
 		while (true) {
 			Sleep(upDateSpeed);
-			//PickItem::Update();
-		}
-	}).detach();
-
-	// 数据更新
-	std::thread([&] {
-		UnityResolve::ThreadAttach();
-		while (true) {
-			Sleep(upDateSpeed);
-			//Role::Update();
+			PickItem::Update();
+			Role::Update();
 		}
 	}).detach();
 	LOG_INFO("启动数据更新线程完成!\n");

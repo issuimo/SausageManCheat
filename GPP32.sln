@@ -5,7 +5,10 @@ VisualStudioVersion = 17.9.34518.117
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GPP32", "GPP32\GPP32.vcxproj", "{482A7D8E-0CBC-4116-BA13-5894B9A259FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InjectHelper", "InjectHelper\InjectHelper.csproj", "{55C468DC-360F-45AD-B9C5-E76E06ABF130}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InjectHelper", "InjectHelper\InjectHelper.csproj", "{55C468DC-360F-45AD-B9C5-E76E06ABF130}"
+	ProjectSection(ProjectDependencies) = postProject
+		{482A7D8E-0CBC-4116-BA13-5894B9A259FA} = {482A7D8E-0CBC-4116-BA13-5894B9A259FA}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

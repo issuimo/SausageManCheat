@@ -12,7 +12,7 @@
 
 auto Main::InitFeatures() -> void {
 #define Anti(name) \
-	LOG_INFO(std::string("关闭->") + #name); \
+	LOG_INFO(std::string("关闭->") + #name + "\n"); \
 	name::AntiStartDetection()
 	Anti(InjectionDetector);
 	Anti(ObscuredCheatingDetector);
@@ -21,7 +21,7 @@ auto Main::InitFeatures() -> void {
 
 
 #define ADD(name) \
-	LOG_INFO(std::string("添加->") + #name); \
+	LOG_INFO(std::string("添加->") + #name + "\n"); \
 	Feature::features[name::GetInstance()->GetInfo().tableName].push_back(reinterpret_cast<Feature*>(name::GetInstance()))
 	ADD(PlayerList);
 	ADD(PlayerEsp);

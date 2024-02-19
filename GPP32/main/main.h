@@ -10,6 +10,7 @@
 #include <vector>
 #include <cstdint>
 #include <map>
+#include <codecvt>
 
 #include "../library/json.hpp"
 #include "../library/imgui/imgui.h"
@@ -19,8 +20,10 @@
 #include "../Library/HotKey.hpp"
 #include "../Library/Console.hpp"
 
-#define U8(X) reinterpret_cast<const char*>(X)
-#define ERROR() LOG_ERROR(std::format("code:{}\n", GetLastError()));
+#undef ERROR;
+
+#define U8 (const char*)u8
+#define ERROR(x) LOG_ERROR(std::format("code:{} info:{}\n", GetLastError(), x));
 
 using I = UnityResolve;
 using IM = UnityResolve::Method;
@@ -38,11 +41,11 @@ protected:
     inline static bool init;
     inline static bool show;
     inline static bool tips;
-    inline static int upDateSpeed = 16;
+    inline static int upDateSpeed = 100;
     inline static int windowHeight;
     inline static int windowWidth;
     inline static HMODULE hModule;
-    inline static std::wstring dllPath;
+    inline static std::string dllPath;
 };
 
 class Feature : public Main {
@@ -71,6 +74,15 @@ protected:
     ~Feature() = default;
     Feature() = default;
 };
+
+inline static std::string GbkToUtf8(const std::string& str) {
+	//GBK locale name in windows
+	const char* GBK_LOCALE_NAME = ".936";
+	std::wstring_convert<std::codecvt_byname<wchar_t, char, mbstate_t>> convert(new std::codecvt_byname<wchar_t, char, mbstate_t>(GBK_LOCALE_NAME));
+	std::wstring tmp_wstr = convert.from_bytes(str);
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> cv2;
+	return cv2.to_bytes(tmp_wstr);
+}
 
 namespace DrawHelp {
 	struct BoxScreen {
@@ -167,7 +179,7 @@ namespace DrawHelp {
 		if (SameLineAfter_) ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
 	}
 
-	static auto GetTeamColor(const unsigned long teamId, const unsigned long a) -> ImColor {
+	static auto GetTeamColor(const unsigned long teamId,int a) -> ImColor {
         switch (teamId) {
 	        case 0: return {0, 0, 0, a};
 	        case 1: return {133, 151, 21, a};
