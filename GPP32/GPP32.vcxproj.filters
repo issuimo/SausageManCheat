@@ -75,7 +75,13 @@
     <ClCompile Include="main\features\setting\setting.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="main\features\aim\Aim.cpp">
+    <ClCompile Include="main\features\player\aim\PlayerAim.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="main\features\memory\player\PlayerMemory.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="main\features\setting\debug.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -179,7 +185,13 @@
     <ClInclude Include="main\GameDefine\Animator\AnimatorControl.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="main\features\aim\Aim.h">
+    <ClInclude Include="main\features\player\aim\PlayerAim.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\features\memory\player\PlayerMemory.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\features\setting\debug.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -34,8 +34,16 @@ void ItemEsp::Render() {
 	ImGui::Checkbox((const char*)u8"启用", &enable);
 }
 void ItemEsp::Update() { Feature::Update(); }
-void ItemEsp::Save(nlohmann::json& json) { Feature::Save(json); }
-void ItemEsp::Load(nlohmann::json& json) { Feature::Load(json); }
+void ItemEsp::Save(nlohmann::json& json) { 
+	json["ItemESP"]["enable"] = enable;
+}
+void ItemEsp::Load(nlohmann::json& json) { 
+	if (json.contains("ItemESP")) {
+		if (json["ItemESP"].contains("enable")) {
+			enable = json["ItemESP"]["enable"];
+		}
+	}
+}
 auto ItemEsp::GetInstance() -> ItemEsp* {
 	static ItemEsp ItemEsp;
 	return &ItemEsp;

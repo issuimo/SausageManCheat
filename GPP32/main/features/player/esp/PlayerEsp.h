@@ -26,6 +26,7 @@ private:
 		bool info;
 		bool line;
 		bool bone;
+		bool part;
 		BoxStyle boxStyle{BoxStyle::Quad};
 	}setting;
 };

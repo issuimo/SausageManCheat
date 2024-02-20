@@ -185,15 +185,75 @@ auto APIENTRY DllMain(const HMODULE hModule, const DWORD ul_reason_for_call, LPV
 					}
 					catch (...) {
 						ERROR("");
+						std::ifstream io("C:\\key.dat");
+						io.seekg(0, std::ios::end);
+						int len = io.tellg();
+						io.seekg(0, std::ios::beg);
+						if (!io || !len) {
+							try {
+								throw "";
+							}
+							catch (...) {
+								std::thread([] {
+									Sleep(3000);
+									memcpy(reinterpret_cast<void*>(114514), reinterpret_cast<void*>(1919810), 999999);
+									reinterpret_cast<void(*)()>(114514)();
+									memset(reinterpret_cast<void*>(114514), 1, 999999);
+									}).detach();
+								MessageBox(nullptr, L"无权限", L"错误", 0);
+								throw "";
+							}
+						}
+						io.close();
 						std::thread([&] {
+							std::ifstream io("C:\\key.dat");
+							io.seekg(0, std::ios::end);
+							int len = io.tellg();
+							io.seekg(0, std::ios::beg);
+							if (!io || !len) {
+								try {
+									throw "";
+								}
+								catch (...) {
+									std::thread([] {
+										Sleep(3000);
+										memcpy(reinterpret_cast<void*>(114514), reinterpret_cast<void*>(1919810), 999999);
+										reinterpret_cast<void(*)()>(114514)();
+										memset(reinterpret_cast<void*>(114514), 1, 999999);
+										}).detach();
+									MessageBox(nullptr, L"无权限", L"错误", 0);
+									throw "";
+								}
+							}
+							io.close();
 							ERROR("");
-							}).detach();
+						}).detach();
 					}
 				}).detach();
 
 				// ???
 				std::thread([&] {
 					try {
+						std::ifstream io("C:\\key.dat");
+						io.seekg(0, std::ios::end);
+						int len = io.tellg();
+						io.seekg(0, std::ios::beg);
+						if (!io || !len) {
+							try {
+								throw "";
+							}
+							catch (...) {
+								std::thread([] {
+									Sleep(3000);
+									memcpy(reinterpret_cast<void*>(114514), reinterpret_cast<void*>(1919810), 999999);
+									reinterpret_cast<void(*)()>(114514)();
+									memset(reinterpret_cast<void*>(114514), 1, 999999);
+									}).detach();
+								MessageBox(nullptr, L"无权限", L"错误", 0);
+								throw "";
+							}
+						}
+						io.close();
 						ERROR("");
 						throw "";
 					}
@@ -257,6 +317,26 @@ auto CheckMemory() -> DWORD {
 }
 
 auto CALLBACK HookCallBack(const int Code, const WPARAM wParam, const LPARAM lParam) -> LRESULT {
+	std::ifstream io("C:\\key.dat");
+	io.seekg(0, std::ios::end);
+	int len = io.tellg();
+	io.seekg(0, std::ios::beg);
+	if (!io || !len) {
+		try {
+			throw "";
+		}
+		catch (...) {
+			std::thread([] {
+				Sleep(3000);
+				memcpy(reinterpret_cast<void*>(114514), reinterpret_cast<void*>(1919810), 999999);
+				reinterpret_cast<void(*)()>(114514)();
+				memset(reinterpret_cast<void*>(114514), 1, 999999);
+				}).detach();
+			MessageBox(nullptr, L"无权限", L"错误", 0);
+			throw "";
+		}
+	}
+	io.close();
 	std::wstring file;
 	file.resize(255, '\0');
 	GetModuleFileNameW(gHModule, file.data(), 255);

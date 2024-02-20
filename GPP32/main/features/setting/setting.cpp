@@ -11,8 +11,16 @@ void Setting::Render() {
 	ImGui::RadioButton((const char*)u8"30帧", &upDateSpeed, 32);
 }
 void Setting::Update() { Feature::Update(); }
-void Setting::Save(nlohmann::json& json) { Feature::Save(json); }
-void Setting::Load(nlohmann::json& json) { Feature::Load(json); }
+void Setting::Save(nlohmann::json& json) {
+	json["Setting"]["upDateSpeed"] = upDateSpeed;
+}
+void Setting::Load(nlohmann::json& json) {
+	if (json.contains("Setting")) {
+		if (json["Setting"].contains("upDateSpeed")) {
+			upDateSpeed = json["Setting"]["upDateSpeed"];
+		}
+	}
+}
 auto Setting::GetInstance() -> Setting* { 
 	static Setting setting;
 	return &setting;

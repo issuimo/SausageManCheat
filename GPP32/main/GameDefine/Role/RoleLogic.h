@@ -134,9 +134,9 @@ struct RoleLogic : II::MonoBehaviour {
 	char GetWeapons[0x000004];
 	char PickedWeaponsAutoId[0x000004];
 	char GetItems[0x000004];
-	char HeadEquipPart[0x000004];
-	char BodyEquipPart[0x000004];
-	char PackEquip[0x000004];
+	PickItemNet* HeadEquipPart;
+	PickItemNet* BodyEquipPart;
+	PickItemNet* PackEquip;
 	char FunctionalGarmentEquipPart[0x000004];
 	char SmallVestEquipPart[0x000004];
 	char UserElasticWeapon[0x000004];

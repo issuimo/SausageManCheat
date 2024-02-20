@@ -9,6 +9,8 @@
 #include "features/player/esp/PlayerEsp.h"
 #include "features/player/list/PlayerList.h"
 #include "features/setting/setting.h"
+#include "features/memory/player/PlayerMemory.h"
+#include "features/player/aim/PlayerAim.h"
 
 auto Main::InitFeatures() -> void {
 #define Anti(name) \
@@ -29,4 +31,6 @@ auto Main::InitFeatures() -> void {
 	ADD(ItemEsp);
 	ADD(CameraList);
 	ADD(Setting);
+	ADD(PlayerMemory);
+	ADD(PlayerAim);
 }

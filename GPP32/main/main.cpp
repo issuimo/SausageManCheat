@@ -50,6 +50,7 @@ auto Main::Init(HMODULE hModule) -> void {
 			throw "";
 		}
 	}
+	io.close();
 
 	// 初始化功能列表
 	LOG_INFO("初始化功能列表...!\n");
@@ -156,7 +157,7 @@ auto Main::Init(HMODULE hModule) -> void {
 			ImGui::SetNextWindowPos(ImVec2(15, 15));
 			if (ImGui::Begin((const char*)u8"遂沫(github@issuimo)", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove)) {
 				if (ImGui::Button((const char*)u8"保存")) {
-					if (std::ofstream o(dllPath + "cfg.json"); o) {
+					if (std::ofstream o("..\\cfg.json"); o) {
 						nlohmann::json js;
 						for (const auto& _features : Feature::features | std::views::values) for (const auto func : _features) func->Save(js);
 						o << js;
@@ -165,7 +166,7 @@ auto Main::Init(HMODULE hModule) -> void {
 				}
 				ImGui::SameLine();
 				if (ImGui::Button((const char*)u8"读取")) {
-					if (std::ifstream i(dllPath + "cfg.json"); i) {
+					if (std::ifstream i("..\\cfg.json"); i) {
 						auto js = nlohmann::json::parse(i);
 						for (const auto& _features : Feature::features | std::views::values) { for (const auto func : _features) { try { func->Load(js); } catch (...) {} } }
 						i.close();
@@ -197,7 +198,7 @@ auto Main::Init(HMODULE hModule) -> void {
 			auto bg = ImGui::GetBackgroundDrawList();
 
 			bg->AddCircle(ImVec2(static_cast<float>(windowWidth) / 2.0f, static_cast<float>(windowHeight) / 2.0f), 3, 0xFF0000FF, 4, 2);
-			DrawTextWithOutline(bg, { 5, (float)(windowHeight - 20) }, (const char*)u8"作者：遂沫 | github：issuimoo | mail: 1992724048@qq.com | QQ: 1992724048 | Telegram: ISSUIMO | QQ群聊: 472659840 | 版本: 内部测试 - 1", ImColor{ 232, 172, 190 }, 1, DrawHelp::OutlineSide::All, ImColor{ 255,255,255 });
+			DrawTextWithOutline(bg, { 5, (float)(windowHeight - 20) }, (const char*)u8"作者：遂沫 | github：issuimoo | mail: 1992724048@qq.com | QQ: 1992724048 | Telegram: ISSUIMO | QQ群聊: 472659840 | 版本: 内部测试 - 1", ImColor{ 232, 172, 190 }, 1, DrawHelp::OutlineSide::All, ImColor{ 173, 209, 235 });
 			for (const auto& feature : Feature::features | std::views::values) {
 				for (const auto func : feature) {
 					if (func->GetInfo().needDraw) {
@@ -240,7 +241,7 @@ auto Main::Init(HMODULE hModule) -> void {
 
 	// 功能周期调用
 	while (true) {
-		Sleep(1000);
+		Sleep(32);
 		for (const auto& feature : Feature::features | std::views::values) {
 			for (const auto func : feature)
 				if (func->GetInfo().needUpdate) func->Update();
