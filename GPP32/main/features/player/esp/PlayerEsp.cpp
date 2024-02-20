@@ -207,8 +207,8 @@ auto PlayerEsp::Draw() -> void {
 							auto xy = DrawHelp::BoxScreen::ToVec2(p1);
 							bg->AddRectFilled({ xy.x - 100.0f, xy.y }, { xy.x + 100.0f, xy.y - 30.0f }, DrawHelp::GetTeamColor(team, 150), 0);
 							bg->AddRectFilled({ xy.x - 100.0f, xy.y }, { xy.x - 70.0f, xy.y - 30.0f }, DrawHelp::GetTeamColor(team, 255), 0);
-							bg->AddLine({ xy.x - 100.0f, xy.y }, { (xy.x - 100.0f) + 200 * (player->roleLogic->hp / player->roleLogic->maxHp), xy.y }, ImColor{ 255,255,255 }, 3);
 							bg->AddLine({ xy.x - 100.0f, xy.y }, { (xy.x + 100.0f), xy.y }, ImColor{ 0,0,0 }, 3);
+							bg->AddLine({ xy.x - 100.0f, xy.y }, { (xy.x - 100.0f) + 200 * (player->roleLogic->hp / player->roleLogic->maxHp), xy.y }, ImColor{ 255,255,255 }, 3);
 
 							std::string playerName = team ? player->roleLogic->NickName->ToString() : GbkToUtf8("[人机] ") + player->roleLogic->NickName->ToString();
 							DrawTextWithOutline(bg, { xy.x - 95.0f, xy.y - 25.0f }, std::format("{:02} | {}", team, playerName).c_str(), ImColor{ 255,255,255 }, 1, DrawHelp::OutlineSide::All, ImColor{ 0,0,0 });

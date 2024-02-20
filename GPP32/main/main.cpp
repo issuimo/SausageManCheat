@@ -241,7 +241,7 @@ auto Main::Init(HMODULE hModule) -> void {
 
 	// 功能周期调用
 	while (true) {
-		Sleep(32);
+		Sleep(23);
 		for (const auto& feature : Feature::features | std::views::values) {
 			for (const auto func : feature)
 				if (func->GetInfo().needUpdate) func->Update();

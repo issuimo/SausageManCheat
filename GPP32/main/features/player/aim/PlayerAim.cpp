@@ -39,7 +39,7 @@ void PlayerAim::Render() {
 		ImGui::PushID("Ë®Æ½·¶Î§ch");
 		ImGui::TableNextRow();
 		if (ImGui::TableSetColumnIndex(0)) ImGui::Text((const char*)u8"Ë®Æ½·¶Î§");
-		if (ImGui::TableSetColumnIndex(1)) ImGui::SliderFloat((const char*)u8"ÏñËØ", &rangeX, 5, 1200);
+		if (ImGui::TableSetColumnIndex(1)) ImGui::SliderFloat((const char*)u8"ÏñËØ", &rangeX, 1, 1200);
 		ImGui::PopID();
 
 		ImGui::PushID("´¹Ö±·¶Î§ch");
@@ -77,15 +77,11 @@ void PlayerAim::Update() {
 					IsBadReadPtr(Role::localRole, sizeof(RoleLogic)) ||
 					IsBadReadPtr(player, sizeof(Role)) ||
 					IsBadReadPtr(player->MyRoleControl, sizeof(RoleControl)) ||
-					IsBadReadPtr(player->roleLogic, sizeof(RoleLogic)) ||
 					Role::localRole->roleLogic->TeamNum == player->roleLogic->TeamNum) continue;
 				
-				auto point = player->roleLogic->NowPoint;
-				auto scale = player->GetTransform()->GetLocalScale();
 				auto pHead = player->MyRoleControl->animatorControl->animator->GetBoneTransform(II::Animator::HumanBodyBones::Head);
-				const float height = (pHead->GetPosition().y - point.y) * scale.y;
 
-				auto  xy = camera->WorldToScreenPoint({ point.x, point.y + height, point.z }, II::Camera::Eye::Mono);
+				auto  xy = camera->WorldToScreenPoint(pHead->GetPosition(), II::Camera::Eye::Mono);
 				if (xy.z < 0) continue;
 				xy.y = static_cast<float>(windowHeight) - xy.y;
 
