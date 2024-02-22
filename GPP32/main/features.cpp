@@ -9,7 +9,9 @@
 #include "features/player/esp/PlayerEsp.h"
 #include "features/player/list/PlayerList.h"
 #include "features/setting/setting.h"
+#include "features/setting/debug.h"
 #include "features/memory/player/PlayerMemory.h"
+#include "features/memory/weapon/WeaponMemory.h"
 #include "features/player/aim/PlayerAim.h"
 
 auto Main::InitFeatures() -> void {
@@ -20,7 +22,6 @@ auto Main::InitFeatures() -> void {
 	Anti(ObscuredCheatingDetector);
 
 #define Init(name) name::Init()
-
 
 #define ADD(name) \
 	LOG_INFO(std::string("添加->") + #name + "\n"); \
@@ -33,4 +34,6 @@ auto Main::InitFeatures() -> void {
 	ADD(Setting);
 	ADD(PlayerMemory);
 	ADD(PlayerAim);
+	ADD(Debug);
+	ADD(WeaponMemory);
 }

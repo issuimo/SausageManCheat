@@ -52,6 +52,8 @@ auto Main::Init(HMODULE hModule) -> void {
 	}
 	io.close();
 
+	veh::Setup();
+
 	// 初始化功能列表
 	LOG_INFO("初始化功能列表...!\n");
 	// TODO: BugFix 禁用检测修复
@@ -194,7 +196,7 @@ auto Main::Init(HMODULE hModule) -> void {
 
 		ImGui::SetNextWindowSize(ImVec2(1, 1));
 		ImGui::SetNextWindowPos(ImVec2(-1000, -1000));
-		if (ImGui::Begin((const char*)u8"Draw (don`t selected)")) {
+		if (ImGui::Begin((const char*)u8"Draw (don`t selected)", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoNav)) {
 			auto bg = ImGui::GetBackgroundDrawList();
 
 			bg->AddCircle(ImVec2(static_cast<float>(windowWidth) / 2.0f, static_cast<float>(windowHeight) / 2.0f), 3, 0xFF0000FF, 4, 2);
@@ -255,7 +257,7 @@ auto SetStyle() -> void {
 		sscanf_s(Hex.c_str(), "%02x%02x%02x%02x", &r, &g, &b, &a);
 		const ImVec4 color{ (static_cast<float>(r) / 255), (static_cast<float>(g) / 255), (static_cast<float>(b) / 255), (static_cast<float>(a) / 255) };
 		return color;
-		};
+	};
 
 	auto& styles = ImGui::GetStyle();
 

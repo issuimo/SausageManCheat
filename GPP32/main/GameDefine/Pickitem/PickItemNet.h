@@ -2,6 +2,7 @@
 #include "../../main.h"
 
 #include "PickItemDataConfig.h"
+#include "../Weapon/SOWeaponControl.h"
 
 struct PickItemNet : II::Object {
 	int AutoId;
@@ -45,7 +46,7 @@ struct PickItemNet : II::Object {
 	char IsDiffAdd_[0x000003];
 	PickItemDataConfig* MyPickItemData;
 	char MySOEquipPart[0x000004];
-	char MySOWeaponControl[0x000004];
+	SOWeaponControl* MySOWeaponControl;
 	char MythSkinEffect[0x000004];
 	char MySOElasticWeaponControl[0x000004];
 	char MySOItemData[0x000004];

@@ -64,14 +64,23 @@ public:
 		if (pClass) {
 			std::vector<PickItem*> temp;
 			try {
-				for (const auto item : pClass->FindObjectsByType<PickItem*>()) {
-					if (!IsBadReadPtr(item, sizeof(PickItem)) && !IsBadReadPtr(item->MyPickItemNet, sizeof(PickItemNet)) && !IsBadReadPtr(item->pickItemData, sizeof(PickItemDataConfig))) {
-						temp.push_back(item);
+				[&]() {
+					__try {
+						[&]() {
+							for (const auto item : pClass->FindObjectsByType<PickItem*>()) {
+								if (!IsBadReadPtr(item, sizeof(PickItem)) && !IsBadReadPtr(item->MyPickItemNet, sizeof(PickItemNet)) && !IsBadReadPtr(item->pickItemData, sizeof(PickItemDataConfig))) {
+									temp.push_back(item);
+								}
+							}
+						}();
+					} __except (EXCEPTION_EXECUTE_HANDLER) {
+						[]() {
+							ERROR("PickItem->FindObjectsByType");
+						}();
 					}
-				}
-			}
-			catch (...) {
-				ERROR("PickItem->FindObjectsByType")
+				}();
+			} catch (const std::exception&) {
+				ERROR("PickItem->FindObjectsByType");
 			}
 			std::lock_guard lock(mutex);
 			vector = temp;

@@ -703,16 +703,26 @@ public:
 		if (!pClass) pClass = I::Get("Assembly-CSharp.dll")->Get("Role");
 		if (pClass) {
 			std::vector<Role*> temp{};
-			Role*              local{};
+			Role* local{};
 			try {
-				for (const auto pRole : pClass->FindObjectsByType<Role*>()) {
-					if (!IsBadReadPtr(pRole, sizeof(Role))) {
-						if (!IsBadReadPtr(pRole->roleLogic, sizeof(RoleLogic)) && pRole->roleLogic->isLocalRole) {
-							local = pRole;
-						}
-						temp.push_back(pRole);
+				[&]() {
+					__try {
+						[&]() {
+							for (const auto pRole : pClass->FindObjectsByType<Role*>()) {
+								if (!IsBadReadPtr(pRole, sizeof(Role))) {
+									if (!IsBadReadPtr(pRole->roleLogic, sizeof(RoleLogic)) && pRole->roleLogic->isLocalRole) {
+										local = pRole;
+									}
+									temp.push_back(pRole);
+								}
+							}
+						}();
+					} __except (EXCEPTION_EXECUTE_HANDLER) {
+						[]() {
+							ERROR("Role-FindObjectsByType");
+						}();
 					}
-				}
+				}();
 			} catch (...) {
 				ERROR("Role-FindObjectsByType");
 			}
@@ -725,6 +735,8 @@ public:
 	inline static std::mutex mutex;
 	inline static Role* localRole;
 	inline static std::vector<Role*> vector;
+	inline static I::Method::MethodPointer<void, void*, II::Vector3> pInit;
+	inline static I::Method::MethodPointer<void, void*, bool> pClear;
 private:
 	inline static I::Class* pClass;
 };

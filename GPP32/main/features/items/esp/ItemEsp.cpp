@@ -21,11 +21,15 @@ void ItemEsp::Draw() {
 					if (sPoint.z < 0) { continue; }
 					auto nPoint = obj->MyPickItemNet->SyncPoint;
 					sPoint.y = static_cast<float>(windowHeight) - sPoint.y;
-					DrawTextWithOutline(bg, { sPoint.x, sPoint.y }, std::format("{}m | {}", (int)sqrt(pow(nPoint.x - mPoint.x, 2) + pow(nPoint.y - mPoint.y, 2) + pow(nPoint.z - mPoint.z, 2)), obj->pickItemData->itemName->ToString()).c_str(), ImColor{ 255,255,0 }, 1, DrawHelp::OutlineSide::All, ImColor{ 0,0,0 });
+					if (obj->pickItemData->itemName->ToString().find(GbkToUtf8("灸灸")) != std::string::npos) {
+						DrawTextWithOutline(bg, { sPoint.x, sPoint.y }, std::format("{}m | {}", (int)sqrt(pow(nPoint.x - mPoint.x, 2) + pow(nPoint.y - mPoint.y, 2) + pow(nPoint.z - mPoint.z, 2)), obj->pickItemData->itemName->ToString()).c_str(), ImColor{ 255,0,0 }, 1, DrawHelp::OutlineSide::All, ImColor{ 0,0,0 });
+					} else {
+						DrawTextWithOutline(bg, { sPoint.x, sPoint.y }, std::format("{}m | {}", (int)sqrt(pow(nPoint.x - mPoint.x, 2) + pow(nPoint.y - mPoint.y, 2) + pow(nPoint.z - mPoint.z, 2)), obj->pickItemData->itemName->ToString()).c_str(), ImColor{ 255,255,0 }, 1, DrawHelp::OutlineSide::All, ImColor{ 0,0,0 });
+					}
+					
 				}
 			}
-		}
-		catch (...) {
+		} catch (...) {
 			ERROR("ItemEsp->nullptr")
 		}
 	}

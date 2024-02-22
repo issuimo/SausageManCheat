@@ -1,4 +1,4 @@
-﻿/*
+﻿﻿/*
  * Update: 2024-2-8 13:00
  * Source: https://github.com/issuimo/UnityResolve.hpp
  * Author: github@issuimo
@@ -558,7 +558,8 @@ public:
 		std::lock_guard   lock(mutex);
 
 		// 检查函数是否已经获取地址, 没有则自动获取
-		if (!address_.contains(funcName) || address_[funcName] == nullptr) {
+		// if (!address_.contains(funcName) || address_[funcName] == nullptr) {
+		if (address_.find(funcName) == address_.end() || address_[funcName] == nullptr) {
 #if WINDOWS_MODE
 			address_[funcName] = static_cast<void*>(GetProcAddress(static_cast<HMODULE>(hmodule_), funcName.c_str()));
 #elif  ANDROID_MODE || LINUX_MODE
@@ -2267,7 +2268,7 @@ public:
 				if (address != nullptr && badPtr) return reinterpret_cast<Return(*)(Args...)>(address)(args...);
 			}
 			catch (...) {}
-#elif
+#elif LINUX_MODE | ANDROID_MODE
 			try {
 				if (address != nullptr) return reinterpret_cast<Return(*)(Args...)>(address)(args...);
 			}

@@ -1,9 +1,9 @@
-﻿#pragma once
+#pragma once
 #include "../../../main.h"
-class ItemEsp : public Feature {
+class WeaponMemory : public Feature {
 public:
-	ItemEsp() = default;
-	~ItemEsp() = default;
+	WeaponMemory() = default;
+	~WeaponMemory() = default;
 
 	auto GetInfo() const -> const GuiInfo & override;
 	auto Draw() -> void override;
@@ -12,12 +12,11 @@ public:
 	auto Save(nlohmann::json& json) -> void override;
 	auto Load(nlohmann::json& json) -> void override;
 
-	static auto GetInstance() -> ItemEsp*;
+	static auto GetInstance() -> WeaponMemory*;
 private:
-	inline static bool enable;
-	struct {
-		bool name;
-		bool num;
-	}setting;
+	inline static bool allAuto;
+	inline static bool noRecoil;
+	inline static float xRecoil = 0;
+	inline static float yRecoil = 0;
 };
 

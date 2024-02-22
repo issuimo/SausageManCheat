@@ -19,6 +19,7 @@
 #include "../library/imgui/implot.h"
 #include "../Library/HotKey.hpp"
 #include "../Library/Console.hpp"
+#include "../library/veh.h"
 
 #undef ERROR;
 
@@ -82,6 +83,61 @@ inline static std::string GbkToUtf8(const std::string& str) {
 	std::wstring tmp_wstr = convert.from_bytes(str);
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> cv2;
 	return cv2.to_bytes(tmp_wstr);
+}
+
+inline static auto LoadCol(float r, float g, float b) -> void {
+	auto& styles = ImGui::GetStyle();
+	auto colors = styles.Colors;
+
+	colors[ImGuiCol_TextDisabled] = ImVec4(r, g, b, colors[ImGuiCol_TextDisabled].w);
+	colors[ImGuiCol_Border] = ImVec4(r, g, b, colors[ImGuiCol_Border].w);
+	colors[ImGuiCol_BorderShadow] = ImVec4(r, g, b, colors[ImGuiCol_BorderShadow].w);
+	colors[ImGuiCol_FrameBg] = ImVec4(r, g, b, colors[ImGuiCol_FrameBg].w);
+	colors[ImGuiCol_FrameBgHovered] = ImVec4(r, g, b, colors[ImGuiCol_FrameBgHovered].w);
+	colors[ImGuiCol_FrameBgActive] = ImVec4(r, g, b, colors[ImGuiCol_FrameBgActive].w);
+	colors[ImGuiCol_TitleBg] = ImVec4(r, g, b, colors[ImGuiCol_TitleBg].w);
+	colors[ImGuiCol_TitleBgActive] = ImVec4(r, g, b, colors[ImGuiCol_TitleBgActive].w);
+	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(r, g, b, colors[ImGuiCol_TitleBgCollapsed].w);
+	colors[ImGuiCol_MenuBarBg] = ImVec4(r, g, b, colors[ImGuiCol_MenuBarBg].w);
+	colors[ImGuiCol_ScrollbarBg] = ImVec4(r, g, b, colors[ImGuiCol_ScrollbarBg].w);
+	colors[ImGuiCol_ScrollbarGrab] = ImVec4(r, g, b, colors[ImGuiCol_ScrollbarGrab].w);
+	colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(r, g, b, colors[ImGuiCol_ScrollbarGrabHovered].w);
+	colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(r, g, b, colors[ImGuiCol_ScrollbarGrabActive].w);
+	colors[ImGuiCol_CheckMark] = ImVec4(r, g, b, colors[ImGuiCol_CheckMark].w);
+	colors[ImGuiCol_SliderGrab] = ImVec4(r, g, b, colors[ImGuiCol_SliderGrab].w);
+	colors[ImGuiCol_SliderGrabActive] = ImVec4(r, g, b, colors[ImGuiCol_SliderGrabActive].w);
+	colors[ImGuiCol_Button] = ImVec4(r, g, b, colors[ImGuiCol_Button].w);
+	colors[ImGuiCol_ButtonHovered] = ImVec4(r, g, b, colors[ImGuiCol_ButtonHovered].w);
+	colors[ImGuiCol_ButtonActive] = ImVec4(r, g, b, colors[ImGuiCol_ButtonActive].w);
+	colors[ImGuiCol_Header] = ImVec4(r, g, b, colors[ImGuiCol_Header].w);
+	colors[ImGuiCol_HeaderHovered] = ImVec4(r, g, b, colors[ImGuiCol_HeaderHovered].w);
+	colors[ImGuiCol_HeaderActive] = ImVec4(r, g, b, colors[ImGuiCol_HeaderActive].w);
+	colors[ImGuiCol_Separator] = ImVec4(r, g, b, colors[ImGuiCol_Separator].w);
+	colors[ImGuiCol_SeparatorHovered] = ImVec4(r, g, b, colors[ImGuiCol_SeparatorHovered].w);
+	colors[ImGuiCol_SeparatorActive] = ImVec4(r, g, b, colors[ImGuiCol_SeparatorActive].w);
+	colors[ImGuiCol_ResizeGrip] = ImVec4(r, g, b, colors[ImGuiCol_ResizeGrip].w);
+	colors[ImGuiCol_ResizeGripHovered] = ImVec4(r, g, b, colors[ImGuiCol_ResizeGripHovered].w);
+	colors[ImGuiCol_ResizeGripActive] = ImVec4(r, g, b, colors[ImGuiCol_ResizeGripActive].w);
+	colors[ImGuiCol_Tab] = ImVec4(r, g, b, colors[ImGuiCol_Tab].w);
+	colors[ImGuiCol_TabHovered] = ImVec4(r, g, b, colors[ImGuiCol_TabHovered].w);
+	colors[ImGuiCol_TabActive] = ImVec4(r, g, b, colors[ImGuiCol_TabActive].w);
+	colors[ImGuiCol_TabUnfocused] = ImVec4(r, g, b, colors[ImGuiCol_TabUnfocused].w);
+	colors[ImGuiCol_TabUnfocusedActive] = ImVec4(r, g, b, colors[ImGuiCol_TabUnfocusedActive].w);
+	colors[ImGuiCol_PlotLines] = ImVec4(r, g, b, colors[ImGuiCol_PlotLines].w);
+	colors[ImGuiCol_PlotLinesHovered] = ImVec4(r, g, b, colors[ImGuiCol_PlotLinesHovered].w);
+	colors[ImGuiCol_PlotHistogram] = ImVec4(r, g, b, colors[ImGuiCol_PlotHistogram].w);
+	colors[ImGuiCol_PlotHistogramHovered] = ImVec4(r, g, b, colors[ImGuiCol_PlotHistogramHovered].w);
+	colors[ImGuiCol_TableHeaderBg] = ImVec4(r, g, b, colors[ImGuiCol_TableHeaderBg].w);
+	colors[ImGuiCol_TableBorderStrong] = ImVec4(r, g, b, colors[ImGuiCol_TableBorderStrong].w);
+	colors[ImGuiCol_TableBorderLight] = ImVec4(r, g, b, colors[ImGuiCol_TableBorderLight].w);
+	colors[ImGuiCol_TableRowBg] = ImVec4(r, g, b, colors[ImGuiCol_TableRowBg].w);
+	colors[ImGuiCol_TableRowBgAlt] = ImVec4(r, g, b, colors[ImGuiCol_TableRowBgAlt].w);
+	colors[ImGuiCol_TextSelectedBg] = ImVec4(r, g, b, colors[ImGuiCol_TextSelectedBg].w);
+	colors[ImGuiCol_DragDropTarget] = ImVec4(r, g, b, colors[ImGuiCol_DragDropTarget].w);
+	colors[ImGuiCol_NavHighlight] = ImVec4(r, g, b, colors[ImGuiCol_NavHighlight].w);
+	colors[ImGuiCol_NavWindowingHighlight] = ImVec4(r, g, b, colors[ImGuiCol_NavWindowingHighlight].w);
+	colors[ImGuiCol_NavWindowingDimBg] = ImVec4(r, g, b, colors[ImGuiCol_NavWindowingDimBg].w);
+	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(r, g, b, colors[ImGuiCol_ModalWindowDimBg].w);
 }
 
 namespace DrawHelp {

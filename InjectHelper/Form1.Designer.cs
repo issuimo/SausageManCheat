@@ -282,7 +282,8 @@
             Controls.Add(this.label2);
             Controls.Add(this.linkLabel1);
             Controls.Add(this.label1);
-            MinimumSize = new Size(547, 328);
+            MaximumSize = new Size(547, 591);
+            MinimumSize = new Size(547, 591);
             Name = "Form1";
             Text = "Inject";
             Load += Form1_Load;

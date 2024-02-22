@@ -84,6 +84,12 @@
     <ClCompile Include="main\features\setting\debug.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="library\veh.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="main\features\memory\weapon\WeaponMemory.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="library\Console.hpp">
@@ -192,6 +198,24 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="main\features\setting\debug.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\Camera\CameraMove.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="library\veh.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\features\memory\weapon\WeaponMemory.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\Weapon\SOWeaponControl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\Weapon\BulletSpeedAndGravity.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\Weapon\UpRecoilInfo.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

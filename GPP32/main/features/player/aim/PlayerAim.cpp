@@ -1,6 +1,6 @@
 #include "PlayerAim.h"
 #include "../../../GameDefine/Role/Role.h"
-
+#include <WinUser.h>
 const Feature::GuiInfo& PlayerAim::GetInfo() const { return *new GuiInfo{ (const char*)u8"×ÔÃé", (const char*)u8"Íæ¼Ò", false, true, true }; };
 void PlayerAim::Draw() { 
 	const auto bg = ImGui::GetBackgroundDrawList();
@@ -81,7 +81,7 @@ void PlayerAim::Update() {
 				
 				auto pHead = player->MyRoleControl->animatorControl->animator->GetBoneTransform(II::Animator::HumanBodyBones::Head);
 
-				auto  xy = camera->WorldToScreenPoint(pHead->GetPosition(), II::Camera::Eye::Mono);
+				auto  xy = camera->WorldToScreenPoint(pHead->GetPosition() + II::Vector3{0, 0.15, 0}, II::Camera::Eye::Mono);
 				if (xy.z < 0) continue;
 				xy.y = static_cast<float>(windowHeight) - xy.y;
 
@@ -91,6 +91,7 @@ void PlayerAim::Update() {
 						len = oLen;
 						screenPoint = DrawHelp::BoxScreen::ToVec2(xy);
 						hasObj = true;
+						aimPlayer = player;
 					}
 				}
 			}
