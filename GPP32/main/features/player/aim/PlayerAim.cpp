@@ -81,7 +81,7 @@ void PlayerAim::Update() {
 				
 				auto pHead = player->MyRoleControl->animatorControl->animator->GetBoneTransform(II::Animator::HumanBodyBones::Head);
 
-				auto  xy = camera->WorldToScreenPoint(pHead->GetPosition() + II::Vector3{0, 0.15, 0}, II::Camera::Eye::Mono);
+				auto xy = camera->WorldToScreenPoint(pHead->GetPosition() + II::Vector3{0, 0.15, 0}, II::Camera::Eye::Mono);
 				if (xy.z < 0) continue;
 				xy.y = static_cast<float>(windowHeight) - xy.y;
 
