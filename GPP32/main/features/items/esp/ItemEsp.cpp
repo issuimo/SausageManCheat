@@ -235,6 +235,33 @@ void ItemEsp::Render() {
 			ImGui::EndTabItem();
 		}
 
+		if (ImGui::BeginTabItem(GbkToUtf8("身份卡").c_str())) {
+			if (ImGui::BeginTable("List", 2,
+				ImGuiTableFlags_ScrollX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY |
+				ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV |
+				ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable,
+				ImVec2(0.0F, ImGui::GetTextLineHeightWithSpacing() * 8))) {
+				ImGui::TableSetupScrollFreeze(1, 1);
+				ImGui::TableSetupColumn((const char*)u8"显示", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn((const char*)u8"名称", ImGuiTableColumnFlags_None);
+				ImGui::TableHeadersRow();
+
+				for (auto& [name, info] : itemInfoList) {
+					if (info.group == GbkToUtf8("身份卡") && info.type.empty()) {
+						ImGui::PushID(name.c_str());
+						ImGui::TableNextRow();
+						if (ImGui::TableSetColumnIndex(0)) ImGui::Checkbox("", &info.show);
+						if (ImGui::TableSetColumnIndex(1)) ImGui::Text(name.c_str());
+
+						ImGui::PopID();
+					}
+				}
+
+				ImGui::EndTable();
+			}
+			ImGui::EndTabItem();
+		}
+
 		if (ImGui::BeginTabItem(GbkToUtf8("其他").c_str())) {
 			if (ImGui::BeginTable("List", 2,
 				ImGuiTableFlags_ScrollX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY |
