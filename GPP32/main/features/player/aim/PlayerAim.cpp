@@ -1,7 +1,7 @@
-#include "PlayerAim.h"
+Ôªø#include "PlayerAim.h"
 #include "../../../GameDefine/Role/Role.h"
 #include <WinUser.h>
-const Feature::GuiInfo& PlayerAim::GetInfo() const { return *new GuiInfo{ (const char*)u8"◊‘√È", (const char*)u8"ÕÊº“", false, true, true }; };
+const Feature::GuiInfo& PlayerAim::GetInfo() const { return *new GuiInfo{ (const char*)u8"Ëá™ÁûÑ", (const char*)u8"Áé©ÂÆ∂", false, true, true }; };
 void PlayerAim::Draw() { 
 	const auto bg = ImGui::GetBackgroundDrawList();
 	if (hasObj) {
@@ -13,46 +13,46 @@ void PlayerAim::Draw() {
 	}
 }
 void PlayerAim::Render() {
-	ImGui::Checkbox((const char*)u8"∆Ù”√", &enable);
+	ImGui::Checkbox((const char*)u8"ÂêØÁî®", &enable);
 	if (enable && ImGui::BeginTable("PlayerEsp", 2,
 		ImGuiTableFlags_ScrollX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY |
 		ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV |
 		ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable,
 		ImVec2(0.0F, ImGui::GetTextLineHeightWithSpacing() * 8))) {
 		ImGui::TableSetupScrollFreeze(1, 1);
-		ImGui::TableSetupColumn(reinterpret_cast<const char*>(u8"√˚≥∆"), ImGuiTableColumnFlags_None);
-		ImGui::TableSetupColumn(reinterpret_cast<const char*>(u8"÷µ"), ImGuiTableColumnFlags_None);
+		ImGui::TableSetupColumn((const char*)u8"ÂêçÁß∞", ImGuiTableColumnFlags_None);
+		ImGui::TableSetupColumn((const char*)u8"ÂÄº", ImGuiTableColumnFlags_None);
 		ImGui::TableHeadersRow();
 
-		ImGui::PushID("ÀŸ∂»Xch");
+		ImGui::PushID("ÈÄüÂ∫¶Xch");
 		ImGui::TableNextRow();
-		if (ImGui::TableSetColumnIndex(0)) ImGui::Text((const char*)u8"ÀÆ∆ΩÀŸ∂»");
-		if (ImGui::TableSetColumnIndex(1)) ImGui::SliderFloat((const char*)u8"∑÷÷Æ“ª", &xSpeed, 3, 50);
+		if (ImGui::TableSetColumnIndex(0)) ImGui::Text((const char*)u8"Ê∞¥Âπ≥ÈÄüÂ∫¶");
+		if (ImGui::TableSetColumnIndex(1)) ImGui::SliderFloat((const char*)u8"ÂàÜ‰πã‰∏Ä", &xSpeed, 3, 50);
 		ImGui::PopID();
 
-		ImGui::PushID("ÀŸ∂»Ych");
+		ImGui::PushID("ÈÄüÂ∫¶Ych");
 		ImGui::TableNextRow();
-		if (ImGui::TableSetColumnIndex(0)) ImGui::Text((const char*)u8"¥π÷±ÀŸ∂»");
-		if (ImGui::TableSetColumnIndex(1)) ImGui::SliderFloat((const char*)u8"∑÷÷Æ“ª", &ySpeed, 3, 50);
+		if (ImGui::TableSetColumnIndex(0)) ImGui::Text((const char*)u8"ÂûÇÁõ¥ÈÄüÂ∫¶");
+		if (ImGui::TableSetColumnIndex(1)) ImGui::SliderFloat((const char*)u8"ÂàÜ‰πã‰∏Ä", &ySpeed, 3, 50);
 		ImGui::PopID();
 
-		ImGui::PushID("ÀÆ∆Ω∑∂Œßch");
+		ImGui::PushID("Ê∞¥Âπ≥ËåÉÂõ¥ch");
 		ImGui::TableNextRow();
-		if (ImGui::TableSetColumnIndex(0)) ImGui::Text((const char*)u8"ÀÆ∆Ω∑∂Œß");
-		if (ImGui::TableSetColumnIndex(1)) ImGui::SliderFloat((const char*)u8"œÒÀÿ", &rangeX, 1, 1200);
+		if (ImGui::TableSetColumnIndex(0)) ImGui::Text((const char*)u8"Ê∞¥Âπ≥ËåÉÂõ¥");
+		if (ImGui::TableSetColumnIndex(1)) ImGui::SliderFloat((const char*)u8"ÂÉèÁ¥†", &rangeX, 1, 1200);
 		ImGui::PopID();
 
-		ImGui::PushID("¥π÷±∑∂Œßch");
+		ImGui::PushID("ÂûÇÁõ¥ËåÉÂõ¥ch");
 		ImGui::TableNextRow();
-		if (ImGui::TableSetColumnIndex(0)) ImGui::Text((const char*)u8"¥π÷±∑∂Œß");
-		if (ImGui::TableSetColumnIndex(1)) ImGui::SliderFloat((const char*)u8"œÒÀÿ", &rangeY, 5, 700);
+		if (ImGui::TableSetColumnIndex(0)) ImGui::Text((const char*)u8"ÂûÇÁõ¥ËåÉÂõ¥");
+		if (ImGui::TableSetColumnIndex(1)) ImGui::SliderFloat((const char*)u8"ÂÉèÁ¥†", &rangeY, 5, 700);
 		ImGui::PopID();
 
-		ImGui::PushID("»»º¸ch");
+		ImGui::PushID("ÁÉ≠ÈîÆch");
 		ImGui::TableNextRow();
-		if (ImGui::TableSetColumnIndex(0)) ImGui::Text((const char*)u8"»»º¸");
+		if (ImGui::TableSetColumnIndex(0)) ImGui::Text((const char*)u8"ÁÉ≠ÈîÆ");
 		if (ImGui::TableSetColumnIndex(1)) {
-			if (ImGui::BeginCombo((const char*)u8"»»º¸", keyName.c_str())) {
+			if (ImGui::BeginCombo((const char*)u8"ÁÉ≠ÈîÆ", keyName.c_str())) {
 				if (ImGui::Selectable("Shift")) { aimKey = 16; keyName = "Shift"; }
 				if (ImGui::Selectable("RButton")) { aimKey = 2; keyName = "RButton"; }
 				if (ImGui::Selectable("LButton")) { aimKey = 1; keyName = "LButton"; }
@@ -71,7 +71,6 @@ void PlayerAim::Update() {
 		try {
 			hasObj = false;
 			float len = 99999;
-			const auto camera = II::Camera::GetAllCamera()[0];
 			for (const auto& player : Role::vector) {
 				if (player == Role::localRole ||
 					IsBadReadPtr(Role::localRole, sizeof(RoleLogic)) ||
@@ -79,11 +78,22 @@ void PlayerAim::Update() {
 					IsBadReadPtr(player->MyRoleControl, sizeof(RoleControl)) ||
 					Role::localRole->roleLogic->TeamNum == player->roleLogic->TeamNum) continue;
 				
-				auto pHead = player->MyRoleControl->animatorControl->animator->GetBoneTransform(II::Animator::HumanBodyBones::Head);
+				II::Transform* pHead;
 
-				auto xy = camera->WorldToScreenPoint(pHead->GetPosition() + II::Vector3{0, 0.15, 0}, II::Camera::Eye::Mono);
+				II::Vector3 xy;
+
+				[&]() {
+					__try {
+						pHead = player->MyRoleControl->animatorControl->animator->GetBoneTransform(II::Animator::HumanBodyBones::Head);
+						xy = WorldToScreenPoint(pHead->GetPosition() + II::Vector3{ 0, 0.15, 0 });
+					} __except (EXCEPTION_EXECUTE_HANDLER) {
+						[]() {
+							ERROR("RoleAim-GetData Error (except)");
+						}();
+					}
+				}();
+
 				if (xy.z < 0) continue;
-				xy.y = static_cast<float>(windowHeight) - xy.y;
 
 				int oLen = (int)sqrt(pow(xy.x - (windowWidth / 2), 2) + pow(xy.y - (windowHeight / 2), 2));
 				if ((xy.x > (windowWidth / 2 - rangeX)) && (xy.x < (windowWidth / 2 + rangeX)) && (xy.y > (windowHeight / 2 - rangeY)) && (xy.y < (windowHeight / 2 + rangeY))) {

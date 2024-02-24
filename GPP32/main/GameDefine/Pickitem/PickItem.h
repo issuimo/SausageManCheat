@@ -2,6 +2,8 @@
 #include "../../main.h"
 #include "PickItemDataConfig.h"
 #include "PickItemNet.h"
+#include "../../features/items/esp/ItemEsp.h"
+#include "../Role/Role.h"
 
 class PickItem : II::MonoBehaviour {
 public:
@@ -75,12 +77,12 @@ public:
 						}();
 					} __except (EXCEPTION_EXECUTE_HANDLER) {
 						[]() {
-							ERROR("PickItem->FindObjectsByType");
+							ERROR("PickItem->FindObjectsByType (except)");
 						}();
 					}
 				}();
 			} catch (const std::exception&) {
-				ERROR("PickItem->FindObjectsByType");
+				ERROR("PickItem->FindObjectsByType (catch)");
 			}
 			std::lock_guard lock(mutex);
 			vector = temp;

@@ -15,8 +15,5 @@ public:
 	static auto GetInstance() -> WeaponMemory*;
 private:
 	inline static bool allAuto;
-	inline static bool noRecoil;
-	inline static float xRecoil = 0;
-	inline static float yRecoil = 0;
 };
 

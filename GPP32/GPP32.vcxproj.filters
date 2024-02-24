@@ -90,6 +90,9 @@
     <ClCompile Include="main\features\memory\weapon\WeaponMemory.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="main\features\setting\analyze.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="library\Console.hpp">
@@ -216,6 +219,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="main\GameDefine\Weapon\UpRecoilInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\Role\HitPart.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\features\setting\analyze.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

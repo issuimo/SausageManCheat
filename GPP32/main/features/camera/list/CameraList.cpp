@@ -1,5 +1,5 @@
 ﻿#include "CameraList.h"
-auto CameraList::GetInfo() const -> const GuiInfo& { return *new GuiInfo{ reinterpret_cast<const char*>(u8"相机"), reinterpret_cast<const char*>(u8"列表"), true, false, false }; }
+auto CameraList::GetInfo() const -> const GuiInfo& { return *new GuiInfo{ (const char*)u8"相机", (const char*)u8"列表", true, false, false }; }
 void CameraList::Draw() { Feature::Draw(); }
 void CameraList::Render() {
 	try {
@@ -13,8 +13,8 @@ void CameraList::Render() {
 		ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable,
 		ImVec2(0.0F, ImGui::GetTextLineHeightWithSpacing() * 8))) {
 		ImGui::TableSetupScrollFreeze(1, 1);
-		ImGui::TableSetupColumn(reinterpret_cast<const char*>(u8"地址"), ImGuiTableColumnFlags_None);
-		ImGui::TableSetupColumn(reinterpret_cast<const char*>(u8"Z缓冲"), ImGuiTableColumnFlags_None);
+		ImGui::TableSetupColumn((const char*)u8"地址", ImGuiTableColumnFlags_None);
+		ImGui::TableSetupColumn((const char*)u8"Z缓冲", ImGuiTableColumnFlags_None);
 		ImGui::TableHeadersRow();
 
 		for (const auto& camera : II::Camera::GetAllCamera()) {

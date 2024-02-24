@@ -1,5 +1,6 @@
-#pragma once
+﻿#pragma once
 #include "../../main.h"
+
 class Debug : public Feature {
 public:
 	Debug() = default;
@@ -17,4 +18,3 @@ private:
 	bool color;
 	float r, g, b;
 };
-

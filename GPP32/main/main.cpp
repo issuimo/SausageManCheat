@@ -9,6 +9,8 @@
 
 extern auto ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT;
 
+LONG CALLBACK VEHPrintf(PEXCEPTION_POINTERS pExceptionInfo);
+
 auto SetStyle() -> void;
 static ID3D11RenderTargetView* mainRenderTargetView;
 auto Main::Init(HMODULE hModule) -> void {
@@ -56,7 +58,6 @@ auto Main::Init(HMODULE hModule) -> void {
 
 	// 初始化功能列表
 	LOG_INFO("初始化功能列表...!\n");
-	// TODO: BugFix 禁用检测修复
 	InitFeatures();
 	LOG_INFO("初始化功能列表成功!\n");
 
@@ -196,11 +197,11 @@ auto Main::Init(HMODULE hModule) -> void {
 
 		ImGui::SetNextWindowSize(ImVec2(1, 1));
 		ImGui::SetNextWindowPos(ImVec2(-1000, -1000));
-		if (ImGui::Begin((const char*)u8"Draw (don`t selected)", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoNav)) {
+		if (ImGui::Begin("Draw (don`t selected)", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoNav)) {
 			auto bg = ImGui::GetBackgroundDrawList();
 
 			bg->AddCircle(ImVec2(static_cast<float>(windowWidth) / 2.0f, static_cast<float>(windowHeight) / 2.0f), 3, 0xFF0000FF, 4, 2);
-			DrawTextWithOutline(bg, { 5, (float)(windowHeight - 20) }, (const char*)u8"作者：遂沫 | github：issuimoo | mail: 1992724048@qq.com | QQ: 1992724048 | Telegram: ISSUIMO | QQ群聊: 472659840 | 版本: 内部测试 - 1", ImColor{ 232, 172, 190 }, 1, DrawHelp::OutlineSide::All, ImColor{ 173, 209, 235 });
+			DrawTextWithOutline(bg, { 5, (float)(windowHeight - 20) }, (const char*)u8"作者：遂沫 | github：issuimoo | mail: 1992724048@qq.com | QQ: 1992724048 | Telegram: ISSUIMO | QQ群聊: 472659840 | 版本: 内部测试 - 1", ImColor{ 255, 255, 255 }, 1, DrawHelp::OutlineSide::All, ImColor{ 0, 0, 0 });
 			for (const auto& feature : Feature::features | std::views::values) {
 				for (const auto func : feature) {
 					if (func->GetInfo().needDraw) {
@@ -214,7 +215,7 @@ auto Main::Init(HMODULE hModule) -> void {
 		}
 
 		if (tips) {
-			if (ImGui::Begin((const char*)u8"Tips")) {
+			if (ImGui::Begin("Tips")) {
 				ImGui::Text((const char*)u8"请勿用于破坏他人游戏体验 | 按Del打开界面");
 				if (ImGui::Button("OK")) tips = false;
 				ImGui::End();
@@ -229,14 +230,51 @@ auto Main::Init(HMODULE hModule) -> void {
 	});
 	LOG_INFO("安装D3D11HOOK成功!\n");
 
+	AddVectoredExceptionHandler(0, VEHPrintf);
+
 	// 数据更新
 	LOG_INFO("启动数据更新线程...!\n");
 	std::thread([&] {
 		UnityResolve::ThreadAttach();
 		while (true) {
 			Sleep(upDateSpeed);
-			PickItem::Update();
 			Role::Update();
+		}
+	}).detach();
+
+	LOG_INFO("启动数据更新线程...!\n");
+	std::thread([&] {
+		UnityResolve::ThreadAttach();
+		while (true) {
+			Sleep(upDateSpeed);
+			PickItem::Update();
+		}
+	}).detach();
+
+	std::thread([&] {
+		UnityResolve::ThreadAttach();
+		while (true) {
+			Sleep(1);
+			static HMODULE hmodule;
+			if (hmodule) {
+				try {
+					std::uint32_t base = *(std::uint32_t*)((std::uint32_t)hmodule + 0x12C6558);
+					if (!base) { continue; }
+					std::uint32_t p1 = *(std::uint32_t*)(base + 0x5C);
+					if (!p1) { continue; }
+					std::uint32_t p2 = *(std::uint32_t*)(p1 + 0x10);
+					if (!p2) { continue; }
+					std::uint32_t p3 = *(std::uint32_t*)(p2 + 0x10);
+					if (!p3) { continue; }
+					std::uint32_t p4 = *(std::uint32_t*)(p3 + 0x8);
+					if (!p4) { continue; }
+					matrix = *(II::Matrix4x4*)(p4 + 0x2CC);
+				} catch (...) {
+					ERROR("GetMatrix4x4 (catch)");
+				}
+			} else {
+				hmodule = GetModuleHandle(L"UnityPlayer.dll");
+			}
 		}
 	}).detach();
 	LOG_INFO("启动数据更新线程完成!\n");
@@ -249,6 +287,75 @@ auto Main::Init(HMODULE hModule) -> void {
 				if (func->GetInfo().needUpdate) func->Update();
 		}
 	}
+}
+
+LONG CALLBACK VEHPrintf(PEXCEPTION_POINTERS pExceptionInfo) {
+	std::string info;
+	switch (pExceptionInfo->ExceptionRecord->ExceptionCode) {
+	case EXCEPTION_ACCESS_VIOLATION: {
+		info = "线程尝试从虚拟地址读取或写入其没有相应访问权限的虚拟地址";
+	}
+	case EXCEPTION_ARRAY_BOUNDS_EXCEEDED: {
+		info = "线程尝试访问超出边界且基础硬件支持边界检查的数组元素";
+	}
+	case EXCEPTION_BREAKPOINT: {
+		info = "遇到断点";
+	}
+	case EXCEPTION_DATATYPE_MISALIGNMENT: {
+		info = "线程尝试读取或写入在不提供对齐的硬件上未对齐的数据";
+	}
+	case EXCEPTION_FLT_DENORMAL_OPERAND: {
+		info = "浮点运算中的一个操作数是反常运算";
+	}
+	case EXCEPTION_FLT_DIVIDE_BY_ZERO: {
+		info = "线程尝试将浮点值除以 0 的浮点除数";
+	}
+	case EXCEPTION_FLT_INEXACT_RESULT: {
+		info = "浮点运算的结果不能完全表示为小数点";
+	}case EXCEPTION_FLT_INVALID_OPERATION: {
+		info = "此异常表示此列表中未包含的任何浮点异常";
+	}
+	case EXCEPTION_FLT_OVERFLOW: {
+		info = "浮点运算的指数大于相应类型允许的量级";
+	}
+	case EXCEPTION_FLT_STACK_CHECK: {
+		info = "堆栈因浮点运算而溢出或下溢";
+	}
+	case EXCEPTION_FLT_UNDERFLOW: {
+		info = "浮点运算的指数小于相应类型允许的量级";
+	}
+	case EXCEPTION_ILLEGAL_INSTRUCTION: {
+		info = "线程尝试执行无效指令";
+	}case EXCEPTION_IN_PAGE_ERROR: {
+		info = "线程尝试访问不存在的页面，但系统无法加载该页";
+	}
+	case EXCEPTION_INT_DIVIDE_BY_ZERO: {
+		info = "线程尝试将整数值除以零的整数除数";
+	}
+	case EXCEPTION_INT_OVERFLOW: {
+		info = "整数运算的结果导致执行结果中最重要的位";
+	}
+	case EXCEPTION_INVALID_DISPOSITION: {
+		info = "异常处理程序向异常调度程序返回了无效处置";
+	}
+	case EXCEPTION_NONCONTINUABLE_EXCEPTION: {
+		info = "线程尝试在发生不可连续的异常后继续执行";
+	}
+	case EXCEPTION_PRIV_INSTRUCTION: {
+		info = "线程尝试执行在当前计算机模式下不允许其操作的指令";
+	}
+	case EXCEPTION_SINGLE_STEP: {
+		info = "跟踪陷阱或其他单指令机制指示已执行一个指令";
+	}
+	case EXCEPTION_STACK_OVERFLOW: {
+		info = "线程占用了其堆栈";
+	}
+	default:
+		info = "未知异常";
+		break;
+	}
+	ERROR(std::format("异常位于: {} | 异常信息: {:X} {}", (void*)pExceptionInfo->ExceptionRecord->ExceptionAddress, pExceptionInfo->ExceptionRecord->ExceptionCode, info));
+	return EXCEPTION_CONTINUE_SEARCH;
 }
 
 auto SetStyle() -> void {

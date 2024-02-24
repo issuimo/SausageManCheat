@@ -3,6 +3,7 @@
 
 #include "RoleLogic.h"
 #include "RoleControl.h"
+#include "HitPart.h"
 
 class Role : public II::MonoBehaviour {
 public:
@@ -479,7 +480,7 @@ public:
 	bool isStartSingleHardAttackDamageCheck;
 	bool isNeedCheckAttackData;
 	char isNeedCheckAttackData_[0x000002];
-	char punchList[0x000004];
+	II::Array<HitPart*>* punchList;
 	char nowAttackHitPart[0x000004];
 	UnityResolve::UnityType::String* BulletDownHpAudio;
 	UnityResolve::UnityType::GameObject* deadCameraFollowObj;
@@ -719,12 +720,12 @@ public:
 						}();
 					} __except (EXCEPTION_EXECUTE_HANDLER) {
 						[]() {
-							ERROR("Role-FindObjectsByType");
+							ERROR("Role-FindObjectsByType (except)");
 						}();
 					}
 				}();
 			} catch (...) {
-				ERROR("Role-FindObjectsByType");
+				ERROR("Role-FindObjectsByType (catch)");
 			}
 			std::lock_guard lock(mutex);
 			vector = temp;

@@ -14,9 +14,6 @@ public:
 
 	static auto GetInstance() -> PlayerMemory*;
 private:
-	struct {
-		bool enable;
-		float v = 1;
-	}scale;
+
 };
 

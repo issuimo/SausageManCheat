@@ -1,14 +1,13 @@
 ﻿#include "PlayerEsp.h"
 #include "../../../GameDefine/Role/Role.h"
 
-auto PlayerEsp::GetInfo() const -> const GuiInfo& { return *new GuiInfo{ reinterpret_cast<const char*>(u8"玩家"), reinterpret_cast<const char*>(u8"透视"), true, false, true }; }
+auto PlayerEsp::GetInfo() const -> const GuiInfo& { return *new GuiInfo{ (const char*)u8"玩家", (const char*)u8"透视", true, false, true }; }
 auto PlayerEsp::Draw() -> void {
 	if (enable) {
 		const auto bg = ImGui::GetBackgroundDrawList();
 		std::lock_guard lock(Role::mutex);
 		try {
 			if (Role::localRole) {
-				const auto camera = II::Camera::GetAllCamera()[0];
 				II::Vector3 mPoint;
 				if (Role::localRole && !IsBadReadPtr(Role::localRole, sizeof(RoleLogic))) {
 					mPoint = Role::localRole->roleLogic->NowPoint;
@@ -25,21 +24,33 @@ auto PlayerEsp::Draw() -> void {
 
 						auto       point = player->roleLogic->NowPoint;
 						const int  team = player->roleLogic->TeamNum;
-						auto scale = player->GetTransform()->GetLocalScale();
-						auto pHead = player->MyRoleControl->animatorControl->animator->GetBoneTransform(II::Animator::HumanBodyBones::Head);
-						const float height = (pHead->GetPosition().y - point.y) + 0.6 * scale.y;
+						II::Vector3 scale;
+						II::Transform* pHead;
+						float height;
+
+						[&]() {
+							__try {
+								scale = player->GetTransform()->GetLocalScale();
+								pHead = player->MyRoleControl->animatorControl->animator->GetBoneTransform(II::Animator::HumanBodyBones::Head);
+								height = (pHead->GetPosition().y - point.y) + 0.6 * scale.y;
+							} __except (EXCEPTION_EXECUTE_HANDLER) {
+								[]() {
+									ERROR("RoleEsp-GetData Error (except)");
+								}();
+							}
+						}();
+
 						const float radius = 0.5 * scale.x;
 						const float radiusZ = 0.5 * scale.z;
 
-						if (auto sPoint = camera->WorldToScreenPoint(point, II::Camera::Eye::Mono);
+						if (auto sPoint = WorldToScreenPoint(point);
 							sPoint.z > 0) {
-							sPoint.y = static_cast<float>(windowHeight) - sPoint.y;
+
 							if (setting.box) {
 								switch (setting.boxStyle) {
 								case BoxStyle::Quad: {
-									auto  xy = camera->WorldToScreenPoint({ point.x, point.y + height, point.z }, II::Camera::Eye::Mono);
+									auto  xy = WorldToScreenPoint({ point.x, point.y + height, point.z });
 									if (xy.z < 0) continue;
-									xy.y = static_cast<float>(windowHeight) - xy.y;
 									const float w = (sPoint.y - xy.y) / 3;
 
 									ImVec2 p1 = DrawHelp::BoxScreen::ToVec2(xy), p2 = DrawHelp::BoxScreen::ToVec2(xy), p3 = DrawHelp::BoxScreen::ToVec2(sPoint), p4 = DrawHelp::BoxScreen::ToVec2(sPoint);
@@ -53,40 +64,40 @@ auto PlayerEsp::Draw() -> void {
 								}
 								case BoxStyle::ThreeD: {
 									DrawHelp::BoxScreen box;
-									const auto p1 = camera->WorldToScreenPoint({ point.x - radius, point.y, point.z - radiusZ }, II::Camera::Eye::Mono);
+									float fovX = -player->MyRoleControl->y_camRot;
+									II::Vector3 p1Vec3 = { point.x - radius, point.y, point.z - radiusZ };
+									const auto p1 = WorldToScreenPoint(p1Vec3);
 									if (p1.z < 0) continue;
 									box.lowerTopLeft = DrawHelp::BoxScreen::ToVec2(p1);
-									const auto p2 = camera->WorldToScreenPoint({ point.x - radius, point.y, point.z + radiusZ }, II::Camera::Eye::Mono);
+									II::Vector3 p2Vec3 = { point.x - radius, point.y, point.z + radiusZ };
+									const auto p2 = WorldToScreenPoint(p2Vec3);
 									if (p2.z < 0) continue;
 									box.lowerTopRight = DrawHelp::BoxScreen::ToVec2(p2);
-									const auto p3 = camera->WorldToScreenPoint({ point.x + radius, point.y, point.z - radiusZ }, II::Camera::Eye::Mono);
+									II::Vector3 p3Vec3 = { point.x + radius, point.y, point.z - radiusZ };
+									const auto p3 = WorldToScreenPoint(p3Vec3);
 									if (p3.z < 0) continue;
 									box.lowerBottomLeft = DrawHelp::BoxScreen::ToVec2(p3);
-									const auto p4 = camera->WorldToScreenPoint({ point.x + radius, point.y, point.z + radiusZ }, II::Camera::Eye::Mono);
+									II::Vector3 p4Vec3 = { point.x + radius, point.y, point.z + radiusZ };
+									const auto p4 = WorldToScreenPoint(p4Vec3);
 									if (p4.z < 0) continue;
 									box.lowerBottomRight = DrawHelp::BoxScreen::ToVec2(p4);
 
-									const auto p5 = camera->WorldToScreenPoint({ point.x - radius, point.y + height, point.z - radiusZ }, II::Camera::Eye::Mono);
+									II::Vector3 p5Vec3 = { point.x - radius, point.y + height, point.z - radiusZ };
+									const auto p5 = WorldToScreenPoint(p5Vec3);
 									if (p5.z < 0) continue;
 									box.upperTopLeft = DrawHelp::BoxScreen::ToVec2(p5);
-									const auto p6 = camera->WorldToScreenPoint({ point.x - radius, point.y + height, point.z + radiusZ }, II::Camera::Eye::Mono);
+									II::Vector3 p6Vec3 = { point.x - radius, point.y + height, point.z + radiusZ };
+									const auto p6 = WorldToScreenPoint(p6Vec3);
 									if (p6.z < 0) continue;
 									box.upperTopRight = DrawHelp::BoxScreen::ToVec2(p6);
-									const auto p7 = camera->WorldToScreenPoint({ point.x + radius, point.y + height, point.z - radiusZ }, II::Camera::Eye::Mono);
+									II::Vector3 p7Vec3 = { point.x + radius, point.y + height, point.z - radiusZ };
+									const auto p7 = WorldToScreenPoint(p7Vec3);
 									if (p7.z < 0) continue;
 									box.upperBottomLeft = DrawHelp::BoxScreen::ToVec2(p7);
-									const auto p8 = camera->WorldToScreenPoint({ point.x + radius, point.y + height, point.z + radiusZ }, II::Camera::Eye::Mono);
+									II::Vector3 p8Vec3 = { point.x + radius, point.y + height, point.z + radiusZ };
+									const auto p8 = WorldToScreenPoint(p8Vec3);
 									if (p8.z < 0) continue;
 									box.upperBottomRight = DrawHelp::BoxScreen::ToVec2(p8);
-
-									box.lowerTopLeft.y = static_cast<float>(windowHeight) - box.lowerTopLeft.y;
-									box.lowerTopRight.y = static_cast<float>(windowHeight) - box.lowerTopRight.y;
-									box.lowerBottomLeft.y = static_cast<float>(windowHeight) - box.lowerBottomLeft.y;
-									box.lowerBottomRight.y = static_cast<float>(windowHeight) - box.lowerBottomRight.y;
-									box.upperBottomLeft.y = static_cast<float>(windowHeight) - box.upperBottomLeft.y;
-									box.upperBottomRight.y = static_cast<float>(windowHeight) - box.upperBottomRight.y;
-									box.upperTopLeft.y = static_cast<float>(windowHeight) - box.upperTopLeft.y;
-									box.upperTopRight.y = static_cast<float>(windowHeight) - box.upperTopRight.y;
 
 									DrawHelp::DrawQuadLines(box.lowerBottomLeft, box.lowerTopLeft, box.lowerTopRight, box.lowerBottomRight, DrawHelp::GetTeamColor(team, 200));
 									DrawHelp::DrawQuadLines(box.upperBottomLeft, box.upperTopLeft, box.upperTopRight, box.upperBottomRight, DrawHelp::GetTeamColor(team, 200));
@@ -102,47 +113,70 @@ auto PlayerEsp::Draw() -> void {
 							}
 
 							if (setting.line) {
-								const auto p1 = camera->WorldToScreenPoint({ point.x, point.y + height, point.z }, II::Camera::Eye::Mono);
+								const auto p1 = WorldToScreenPoint({ point.x, point.y + height, point.z });
 								if (p1.z < 0) continue;
 								auto xy = DrawHelp::BoxScreen::ToVec2(p1);
-								xy.y = static_cast<float>(windowHeight) - xy.y;
 								bg->AddLine({ static_cast<float>(windowWidth) / 2, 0 }, xy, DrawHelp::GetTeamColor(team, 200), 1);
 							}
 
 							if (setting.bone) {
 								try {
 									if (auto animator = player->MyRoleControl->animatorControl->animator) {
-										auto head = animator->GetBoneTransform(II::Animator::HumanBodyBones::Head);
-										auto chest = animator->GetBoneTransform(II::Animator::HumanBodyBones::Chest);
-										auto hips = animator->GetBoneTransform(II::Animator::HumanBodyBones::Hips);
-										auto leftArmU = animator->GetBoneTransform(II::Animator::HumanBodyBones::LeftUpperArm);
-										auto rightArmU = animator->GetBoneTransform(II::Animator::HumanBodyBones::RightUpperArm);
-										auto leftArmL = animator->GetBoneTransform(II::Animator::HumanBodyBones::LeftLowerArm);
-										auto rightArmL = animator->GetBoneTransform(II::Animator::HumanBodyBones::RightLowerArm);
-										auto leftLegU = animator->GetBoneTransform(II::Animator::HumanBodyBones::LeftUpperLeg);
-										auto rightLegU = animator->GetBoneTransform(II::Animator::HumanBodyBones::RightUpperLeg);
-										auto leftLegL = animator->GetBoneTransform(II::Animator::HumanBodyBones::LeftLowerLeg);
-										auto rightLegL = animator->GetBoneTransform(II::Animator::HumanBodyBones::RightLowerLeg);
-										auto rightHand = animator->GetBoneTransform(II::Animator::HumanBodyBones::RightHand);
-										auto leftHand = animator->GetBoneTransform(II::Animator::HumanBodyBones::LeftHand);
-										auto rightFoot = animator->GetBoneTransform(II::Animator::HumanBodyBones::RightFoot);
-										auto leftFoot = animator->GetBoneTransform(II::Animator::HumanBodyBones::LeftFoot);
+										II::Vector3 p1;
+										II::Vector3 p2;
+										II::Vector3 p3;
+										II::Vector3 p4;
+										II::Vector3 p5;
+										II::Vector3 p6;
+										II::Vector3 p7;
+										II::Vector3 p8;
+										II::Vector3 p9;
+										II::Vector3 p10;
+										II::Vector3 p11;
+										II::Vector3 p12;
+										II::Vector3 p13;
+										II::Vector3 p14;
+										II::Vector3 p15;
 
-										const auto p1 = camera->WorldToScreenPoint(head->GetPosition(), II::Camera::Eye::Mono);
-										const auto p2 = camera->WorldToScreenPoint(chest->GetPosition(), II::Camera::Eye::Mono);
-										const auto p3 = camera->WorldToScreenPoint(hips->GetPosition(), II::Camera::Eye::Mono);
-										const auto p4 = camera->WorldToScreenPoint(leftArmU->GetPosition(), II::Camera::Eye::Mono);
-										const auto p5 = camera->WorldToScreenPoint(rightArmU->GetPosition(), II::Camera::Eye::Mono);
-										const auto p6 = camera->WorldToScreenPoint(leftArmL->GetPosition(), II::Camera::Eye::Mono);
-										const auto p7 = camera->WorldToScreenPoint(rightArmL->GetPosition(), II::Camera::Eye::Mono);
-										const auto p8 = camera->WorldToScreenPoint(leftLegU->GetPosition(), II::Camera::Eye::Mono);
-										const auto p9 = camera->WorldToScreenPoint(rightLegU->GetPosition(), II::Camera::Eye::Mono);
-										const auto p10 = camera->WorldToScreenPoint(leftLegL->GetPosition(), II::Camera::Eye::Mono);
-										const auto p11 = camera->WorldToScreenPoint(rightLegL->GetPosition(), II::Camera::Eye::Mono);
-										const auto p12 = camera->WorldToScreenPoint(rightHand->GetPosition(), II::Camera::Eye::Mono);
-										const auto p13 = camera->WorldToScreenPoint(leftHand->GetPosition(), II::Camera::Eye::Mono);
-										const auto p14 = camera->WorldToScreenPoint(rightFoot->GetPosition(), II::Camera::Eye::Mono);
-										const auto p15 = camera->WorldToScreenPoint(leftFoot->GetPosition(), II::Camera::Eye::Mono);
+										[&]() {
+											__try {
+												auto head = animator->GetBoneTransform(II::Animator::HumanBodyBones::Head);
+												auto chest = animator->GetBoneTransform(II::Animator::HumanBodyBones::Chest);
+												auto hips = animator->GetBoneTransform(II::Animator::HumanBodyBones::Hips);
+												auto leftArmU = animator->GetBoneTransform(II::Animator::HumanBodyBones::LeftUpperArm);
+												auto rightArmU = animator->GetBoneTransform(II::Animator::HumanBodyBones::RightUpperArm);
+												auto leftArmL = animator->GetBoneTransform(II::Animator::HumanBodyBones::LeftLowerArm);
+												auto rightArmL = animator->GetBoneTransform(II::Animator::HumanBodyBones::RightLowerArm);
+												auto leftLegU = animator->GetBoneTransform(II::Animator::HumanBodyBones::LeftUpperLeg);
+												auto rightLegU = animator->GetBoneTransform(II::Animator::HumanBodyBones::RightUpperLeg);
+												auto leftLegL = animator->GetBoneTransform(II::Animator::HumanBodyBones::LeftLowerLeg);
+												auto rightLegL = animator->GetBoneTransform(II::Animator::HumanBodyBones::RightLowerLeg);
+												auto rightHand = animator->GetBoneTransform(II::Animator::HumanBodyBones::RightHand);
+												auto leftHand = animator->GetBoneTransform(II::Animator::HumanBodyBones::LeftHand);
+												auto rightFoot = animator->GetBoneTransform(II::Animator::HumanBodyBones::RightFoot);
+												auto leftFoot = animator->GetBoneTransform(II::Animator::HumanBodyBones::LeftFoot);
+
+												p1 = WorldToScreenPoint(head->GetPosition());
+												p2 = WorldToScreenPoint(chest->GetPosition());
+												p3 = WorldToScreenPoint(hips->GetPosition());
+												p4 = WorldToScreenPoint(leftArmU->GetPosition());
+												p5 = WorldToScreenPoint(rightArmU->GetPosition());
+												p6 = WorldToScreenPoint(leftArmL->GetPosition());
+												p7 = WorldToScreenPoint(rightArmL->GetPosition());
+												p8 = WorldToScreenPoint(leftLegU->GetPosition());
+												p9 = WorldToScreenPoint(rightLegU->GetPosition());
+												p10 = WorldToScreenPoint(leftLegL->GetPosition());
+												p11 = WorldToScreenPoint(rightLegL->GetPosition());
+												p12 = WorldToScreenPoint(rightHand->GetPosition());
+												p13 = WorldToScreenPoint(leftHand->GetPosition());
+												p14 = WorldToScreenPoint(rightFoot->GetPosition());
+												p15 = WorldToScreenPoint(leftFoot->GetPosition());
+											} __except (EXCEPTION_EXECUTE_HANDLER) {
+												[]() {
+													ERROR("RoleEsp-AnimatorBone Error (except)");
+												}();
+											}
+										}();
 
 #define B(x) x.z > -1
 										if (B(p1) && B(p2) && B(p3) && B(p4) && B(p5) && B(p6) && B(p7) && B(p8) && B(p9) && B(p10) && B(p11) && B(p12) && B(p13) && B(p14) && B(p15)) {
@@ -162,37 +196,20 @@ auto PlayerEsp::Draw() -> void {
 											auto pRightFoot = DrawHelp::BoxScreen::ToVec2(p14);
 											auto pLeftFoot = DrawHelp::BoxScreen::ToVec2(p15);
 
-#define S(x) x.y = static_cast<float>(windowHeight) - x.y
-											S(pHead);
-											S(pChest);
-											S(pHips);
-											S(pLeftArmU);
-											S(pRightArmU);
-											S(pLeftArmL);
-											S(pRightArmL);
-											S(pLeftLegU);
-											S(pRightLegU);
-											S(pLeftLegL);
-											S(pRightLegL);
-											S(pRightHand);
-											S(pLeftHand);
-											S(pRightFoot);
-											S(pLeftFoot);
-
-											bg->AddLine(pHead, pChest, DrawHelp::GetTeamColor(team, 255), 2);
-											bg->AddLine(pChest, pLeftArmU, DrawHelp::GetTeamColor(team, 255), 2);
-											bg->AddLine(pChest, pRightArmU, DrawHelp::GetTeamColor(team, 255), 2);
-											bg->AddLine(pLeftArmU, pLeftArmL, DrawHelp::GetTeamColor(team, 255), 2);
-											bg->AddLine(pRightArmU, pRightArmL, DrawHelp::GetTeamColor(team, 255), 2);
-											bg->AddLine(pLeftArmL, pLeftHand, DrawHelp::GetTeamColor(team, 255), 2);
-											bg->AddLine(pRightArmL, pRightHand, DrawHelp::GetTeamColor(team, 255), 2);
-											bg->AddLine(pChest, pHips, DrawHelp::GetTeamColor(team, 255), 2);
-											bg->AddLine(pHips, pLeftLegU, DrawHelp::GetTeamColor(team, 255), 2);
-											bg->AddLine(pHips, pRightLegU, DrawHelp::GetTeamColor(team, 255), 2);
-											bg->AddLine(pLeftLegU, pLeftLegL, DrawHelp::GetTeamColor(team, 255), 2);
-											bg->AddLine(pRightLegU, pRightLegL, DrawHelp::GetTeamColor(team, 255), 2);
-											bg->AddLine(pLeftLegL, pLeftFoot, DrawHelp::GetTeamColor(team, 255), 2);
-											bg->AddLine(pRightLegL, pRightFoot, DrawHelp::GetTeamColor(team, 255), 2);
+											bg->AddLine(pHead, pChest, DrawHelp::GetTeamColor(team, 255), 1);
+											bg->AddLine(pChest, pLeftArmU, DrawHelp::GetTeamColor(team, 255), 1);
+											bg->AddLine(pChest, pRightArmU, DrawHelp::GetTeamColor(team, 255), 1);
+											bg->AddLine(pLeftArmU, pLeftArmL, DrawHelp::GetTeamColor(team, 255), 1);
+											bg->AddLine(pRightArmU, pRightArmL, DrawHelp::GetTeamColor(team, 255), 1);
+											bg->AddLine(pLeftArmL, pLeftHand, DrawHelp::GetTeamColor(team, 255), 1);
+											bg->AddLine(pRightArmL, pRightHand, DrawHelp::GetTeamColor(team, 255), 1);
+											bg->AddLine(pChest, pHips, DrawHelp::GetTeamColor(team, 255), 1);
+											bg->AddLine(pHips, pLeftLegU, DrawHelp::GetTeamColor(team, 255), 1);
+											bg->AddLine(pHips, pRightLegU, DrawHelp::GetTeamColor(team, 255), 1);
+											bg->AddLine(pLeftLegU, pLeftLegL, DrawHelp::GetTeamColor(team, 255), 1);
+											bg->AddLine(pRightLegU, pRightLegL, DrawHelp::GetTeamColor(team, 255), 1);
+											bg->AddLine(pLeftLegL, pLeftFoot, DrawHelp::GetTeamColor(team, 255), 1);
+											bg->AddLine(pRightLegL, pRightFoot, DrawHelp::GetTeamColor(team, 255), 1);
 										}
 									}
 								}
@@ -202,9 +219,8 @@ auto PlayerEsp::Draw() -> void {
 							}
 
 							if (setting.info) {
-								auto p1 = camera->WorldToScreenPoint({ point.x, point.y + height, point.z }, II::Camera::Eye::Mono);
+								auto p1 = WorldToScreenPoint({ point.x, point.y + height, point.z });
 								if (p1.z < 0) continue;
-								p1.y = static_cast<float>(windowHeight) - p1.y;
 								auto xy = DrawHelp::BoxScreen::ToVec2(p1);
 								bg->AddRectFilled({ xy.x - 100.0f, xy.y }, { xy.x + 100.0f, xy.y - 30.0f }, DrawHelp::GetTeamColor(team, 150), 0);
 								bg->AddRectFilled({ xy.x - 100.0f, xy.y }, { xy.x - 70.0f, xy.y - 30.0f }, DrawHelp::GetTeamColor(team, 255), 0);
@@ -255,8 +271,8 @@ auto PlayerEsp::Render() -> void {
 		ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable,
 		ImVec2(0.0F, ImGui::GetTextLineHeightWithSpacing() * 8))) {
 		ImGui::TableSetupScrollFreeze(1, 1);
-		ImGui::TableSetupColumn(reinterpret_cast<const char*>(u8"启用"), ImGuiTableColumnFlags_None);
-		ImGui::TableSetupColumn(reinterpret_cast<const char*>(u8"名称"), ImGuiTableColumnFlags_None);
+		ImGui::TableSetupColumn((const char*)u8"启用", ImGuiTableColumnFlags_None);
+		ImGui::TableSetupColumn((const char*)u8"名称", ImGuiTableColumnFlags_None);
 		ImGui::TableHeadersRow();
 
 		ImGui::PushID("方框ch");

@@ -1,19 +1,18 @@
-#include "debug.h"
-const Feature::GuiInfo& Debug::GetInfo() const { return *new GuiInfo{ (const char*)u8"µ÷ÊÔ", (const char*)u8"½çÃæ", true, false, true }; };
+ï»¿#include "debug.h"
+const Feature::GuiInfo& Debug::GetInfo() const { return *new GuiInfo{ (const char*)u8"è°ƒè¯•", (const char*)u8"ç•Œé¢", true, false, true }; };
 void Debug::Draw() { 
 	if (color) {
 		ImGui::ShowDemoWindow();
 	}
 }
 void Debug::Render() {
-	ImGui::Checkbox((const char*)u8"´ò¿ªDemo", &color);
+	ImGui::Checkbox((const char*)u8"æ‰“å¼€Demo", &color);
 	ImGui::SliderFloat("R", &r, 0, 1);
 	ImGui::SliderFloat("G", &g, 0, 1);
 	ImGui::SliderFloat("B", &b, 0, 1);
-	if (ImGui::Button((const char*)u8"ÔØÈë")) {
+	if (ImGui::Button((const char*)u8"è½½å…¥")) {
 		LoadCol(r, g, b);
 	}
-
 }
 void Debug::Update() { Feature::Update(); }
 void Debug::Save(nlohmann::json& json) {

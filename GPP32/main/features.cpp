@@ -9,6 +9,7 @@
 #include "features/player/esp/PlayerEsp.h"
 #include "features/player/list/PlayerList.h"
 #include "features/setting/setting.h"
+#include "features/setting/analyze.h"
 #include "features/setting/debug.h"
 #include "features/memory/player/PlayerMemory.h"
 #include "features/memory/weapon/WeaponMemory.h"
@@ -36,4 +37,5 @@ auto Main::InitFeatures() -> void {
 	ADD(PlayerAim);
 	ADD(Debug);
 	ADD(WeaponMemory);
+	ADD(Analyze);
 }

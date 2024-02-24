@@ -1,0 +1,49 @@
+#pragma once
+#include "../../main.h"
+struct HitPart : II::MonoBehaviour {
+
+	char MySOData[0x000004];
+	bool isCloseBulletOnEquip;
+	char isCloseBulletOnEquip_[0x000003];
+	char userRole[0x000004];
+	UnityResolve::UnityType::Rigidbody* myRigidBody;
+	char myRigidBody_[0x000004];
+	std::int64_t AutoId;
+	UnityResolve::UnityType::Transform* myTransform;
+	char meleeWeaponSlot[0x000004];
+	bool hasMeleeWeaponSlot;
+	bool _IsLeftWeapon_k__BackingField;
+	bool isEquip;
+	char isEquip_[0x000001];
+	UnityResolve::UnityType::GameObject* myGameObj;
+	char attackData[0x000004];
+	char myPickItem[0x000004];
+	char mStartGame[0x000004];
+	char hitType[0x000004];
+	bool isShowSkin;
+	char isShowSkin_[0x000003];
+	char decorationManager[0x000004];
+	UnityResolve::UnityType::String* skinSign;
+	UnityResolve::UnityType::GameObject* skin;
+	bool isPanch;
+	char isPanch_[0x000003];
+	UnityResolve::UnityType::String* attackSoundId;
+	bool isCanCheckOther;
+	char isCanCheckOther_[0x000003];
+	char raycastHits[0x000004];
+	float slowTime;
+	float slowTimeSet;
+	bool openSlowAnim;
+	char openSlowAnim_[0x000003];
+	char meleeStoreChangeData[0x000004];
+	bool isStartChangeScale;
+	bool hasChangeScale;
+	char hasChangeScale_[0x000002];
+	float ratio;
+	float nowScale;
+	float storeTime;
+	float nowTime;
+	char skinLightAttackSigns[0x000004];
+	char skinHeavyAttackSigns[0x000004];
+
+};
