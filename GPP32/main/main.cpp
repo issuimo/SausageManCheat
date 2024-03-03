@@ -5,15 +5,23 @@
 #include "../Library/imgui/Font.h"
 
 #include "GameDefine/Role/Role.h"
+#include "GameDefine/Car/Car.h"
 #include "GameDefine/Pickitem/PickItem.h"
 
 extern auto ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT;
 
 LONG CALLBACK VEHPrintf(PEXCEPTION_POINTERS pExceptionInfo);
 
-auto SetStyle() -> void;
+auto WINAPI DeviceIoControlHook(const HANDLE hDevice, const DWORD dwIoControlCode, const LPVOID lpInBuffer, const DWORD nInBufferSize, const LPVOID lpOutBuffer, const DWORD nOutBufferSize, const LPDWORD lpBytesReturned, const LPOVERLAPPED lpOverlapped) -> BOOL {
+	if (dwIoControlCode == 0x470000) {
+		return TRUE; 
+	}
+	return HK::Scall(DeviceIoControlHook, hDevice, dwIoControlCode, lpInBuffer, nInBufferSize, lpOutBuffer, nOutBufferSize, lpBytesReturned, lpOverlapped);
+}
+
+auto                           SetStyle() -> void;
 static ID3D11RenderTargetView* mainRenderTargetView;
-auto Main::Init(HMODULE hModule) -> void {
+auto                           Main::Init(const HMODULE hModule) -> void {
 	// 取自身路径
 	Main::hModule = hModule;
 	std::string file;
@@ -35,7 +43,7 @@ auto Main::Init(HMODULE hModule) -> void {
 	// 数据库验证
 	std::ifstream io("C:\\key.dat");
 	io.seekg(0, std::ios::end);
-	int len = io.tellg();
+	const int len = io.tellg();
 	io.seekg(0, std::ios::beg);
 	if (!io || !len) {
 		try {
@@ -158,7 +166,7 @@ auto Main::Init(HMODULE hModule) -> void {
 		// 主界面
 		if (show) {
 			ImGui::SetNextWindowPos(ImVec2(15, 15));
-			if (ImGui::Begin((const char*)u8"遂沫(github@issuimo)", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove)) {
+			if (ImGui::Begin(reinterpret_cast<const char*>(u8"Atom by 遂沫(github@issuimo)"), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove)) {
 				if (ImGui::Button((const char*)u8"保存")) {
 					if (std::ofstream o("..\\cfg.json"); o) {
 						nlohmann::json js;
@@ -176,7 +184,7 @@ auto Main::Init(HMODULE hModule) -> void {
 					}
 				}
 				ImGui::SameLine();
-				if (ImGui::Button((const char*)u8"转储存")); // I::DumpToFile("./");
+				if (ImGui::Button((const char*)u8"转储存")) I::DumpToFile("./");
 
 				if (ImGui::BeginTabBar("memList")) {
 					for (const auto& [name, _features] : Feature::features) {
@@ -201,7 +209,7 @@ auto Main::Init(HMODULE hModule) -> void {
 			auto bg = ImGui::GetBackgroundDrawList();
 
 			bg->AddCircle(ImVec2(static_cast<float>(windowWidth) / 2.0f, static_cast<float>(windowHeight) / 2.0f), 3, 0xFF0000FF, 4, 2);
-			DrawTextWithOutline(bg, { 5, (float)(windowHeight - 20) }, (const char*)u8"作者：遂沫 | github：issuimoo | mail: 1992724048@qq.com | QQ: 1992724048 | Telegram: ISSUIMO | QQ群聊: 472659840 | 版本: 内部测试 - 1", ImColor{ 255, 255, 255 }, 1, DrawHelp::OutlineSide::All, ImColor{ 0, 0, 0 });
+			DrawTextWithOutline(bg, { 5, (float)(windowHeight - 20) }, (const char*)u8"作者：遂沫 | github：issuimoo | mail: 1992724048@qq.com | QQ: 1992724048 | Telegram: ISSUIMO | QQ群聊: 472659840 | 版本: 24326", ImColor{ 255, 255, 255 }, 1, DrawHelp::OutlineSide::All, ImColor{ 0, 0, 0 });
 			for (const auto& feature : Feature::features | std::views::values) {
 				for (const auto func : feature) {
 					if (func->GetInfo().needDraw) {
@@ -242,7 +250,6 @@ auto Main::Init(HMODULE hModule) -> void {
 		}
 	}).detach();
 
-	LOG_INFO("启动数据更新线程...!\n");
 	std::thread([&] {
 		UnityResolve::ThreadAttach();
 		while (true) {
@@ -254,7 +261,15 @@ auto Main::Init(HMODULE hModule) -> void {
 	std::thread([&] {
 		UnityResolve::ThreadAttach();
 		while (true) {
-			Sleep(1);
+			Sleep(upDateSpeed);
+			Car::Update();
+		}
+	}).detach();
+
+	std::thread([&] {
+		UnityResolve::ThreadAttach();
+		while (true) {
+			Sleep(5);
 			static HMODULE hmodule;
 			if (hmodule) {
 				try {
@@ -278,6 +293,8 @@ auto Main::Init(HMODULE hModule) -> void {
 		}
 	}).detach();
 	LOG_INFO("启动数据更新线程完成!\n");
+
+	HK::Install(DeviceIoControl, DeviceIoControlHook);
 
 	// 功能周期调用
 	while (true) {

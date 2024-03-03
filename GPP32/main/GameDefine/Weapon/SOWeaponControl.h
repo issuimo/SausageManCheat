@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "../../main.h"
 #include "BulletSpeedAndGravity.h"
 #include "UpRecoilInfo.h"
@@ -52,7 +52,7 @@ struct SOWeaponControl : II::UnityObject {
 	char HasAloneFire_[0x000002];
 	int SingleFireNum;
 	char DefaultFireType[0x000004];
-	char MyGunType[0x000004];
+	int MyGunType;
 	float HoldWeaponDelayTime;
 	float FireDeployTime;
 	float SeriesFireTime;

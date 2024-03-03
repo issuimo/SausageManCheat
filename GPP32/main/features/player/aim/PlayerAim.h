@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "../../../main.h"
 #include "../../../GameDefine/Role/Role.h"
 
@@ -17,6 +17,7 @@ public:
 	static auto GetInstance() -> PlayerAim*;
 private:
 	bool enable;
+	bool teleport;
 	float xSpeed = 20;
 	float ySpeed = 20;
 	int aimKey = 16;
@@ -26,5 +27,10 @@ private:
 	float rangeX = 100;
 	float rangeY = 100;
 	Role* aimPlayer;
+	bool readyAim;
+	float readyValue = 1;
+	bool aimLock;
+	bool aimWeak;
+	float dis;
 };
 

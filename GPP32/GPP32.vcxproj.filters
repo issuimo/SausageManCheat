@@ -93,6 +93,12 @@
     <ClCompile Include="main\features\setting\analyze.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="main\features\cars\list\CarList.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="main\features\cars\esp\CarEsp.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="library\Console.hpp">
@@ -227,5 +233,102 @@
     <ClInclude Include="main\features\setting\analyze.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="main\GameDefine\Car\Car.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\Car\SOCarDataConfig.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\Car\CarNet.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\Network\NetworkBase.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\features\cars\list\CarList.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheat.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\features\cars\esp\CarEsp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\Role\RoleLogicServer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatMove.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatConfig.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatMTP.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatCollider.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatUseItem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatBullet.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatAction.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatCar.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatWeapon.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatBulletFireData.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatMeleeAttackData.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatHolySword.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatKill.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatJump.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatPoint.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatWave.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\NetworkServer_GameCheat.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="library\detours\detours.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="library\detours\HookManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\InjectionDetectedEventHandler.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\Role\RoleNet.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\Network\IGameWorldMessage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="main\GameDefine\AntiCheat\CmdCheckRoleSize.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="library\detours\[x64]detours.lib" />
+    <Library Include="library\detours\[x86]detours.lib" />
   </ItemGroup>
 </Project>

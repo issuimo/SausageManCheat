@@ -66,7 +66,7 @@ public:
 		if (pClass) {
 			std::vector<PickItem*> temp;
 			try {
-				[&]() {
+				[&] {
 					__try {
 						[&]() {
 							for (const auto item : pClass->FindObjectsByType<PickItem*>()) {
@@ -76,7 +76,7 @@ public:
 							}
 						}();
 					} __except (EXCEPTION_EXECUTE_HANDLER) {
-						[]() {
+						[] {
 							ERROR("PickItem->FindObjectsByType (except)");
 						}();
 					}
@@ -89,8 +89,34 @@ public:
 		}
 	}
 
+	static void Init() {
+		pClass = I::Get("Assembly-CSharp.dll")->Get("PickItem");
+		if (pClass) {
+			awake = pClass->Get<IM>("Awake")->Cast<void, PickItem*>();
+			clear = pClass->Get<IM>("clear")->Cast<void, PickItem*>();
+			// veh::Hook(awake, Awake);
+			// veh::Hook(clear, Clear);
+		}
+	}
+
+	static void Awake(PickItem* _this) {
+		veh::CallOriginal<void>(awake, _this);
+		allVector.push_back(_this);
+		return;
+	}
+
+	static auto Clear(PickItem* _this) -> void {
+		veh::CallOriginal<void>(clear, _this);
+		if (const auto it = std::ranges::find(allVector, _this); it != allVector.end()) {
+			allVector.erase(it);
+		}
+		return;
+	}
+
 	inline static std::mutex mutex;
 	inline static std::vector<PickItem*> vector;
-private:
+	inline static std::vector<PickItem*> allVector;
 	inline static I::Class* pClass;
+	inline static IM::MethodPointer<void, PickItem*> awake;
+	inline static IM::MethodPointer<void, PickItem*> clear;
 };

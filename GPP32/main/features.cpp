@@ -2,10 +2,18 @@
 
 #include "GameDefine/AntiCheat/InjectionDetector.h"
 #include "GameDefine/AntiCheat/ObscuredCheatingDetector.h"
+#include "GameDefine/AntiCheat/RoleCheat.h"
+#include "GameDefine/AntiCheat/RoleCheatConfig.h"
+#include "GameDefine/Role/RoleNet.h"
+#include "GameDefine/AntiCheat/NetworkServer_GameCheat.h"
+#include "GameDefine/Camera/CameraMove.hpp"
+#include "GameDefine/Pickitem/PickItem.h"
 
 #include "features/camera/list/CameraList.h"
 #include "features/items/esp/ItemEsp.h"
 #include "features/items/list/ItemList.h"
+#include "features/cars/list/CarList.h"
+#include "features/cars/esp/CarEsp.h"
 #include "features/player/esp/PlayerEsp.h"
 #include "features/player/list/PlayerList.h"
 #include "features/setting/setting.h"
@@ -21,8 +29,16 @@ auto Main::InitFeatures() -> void {
 	name::AntiStartDetection()
 	Anti(InjectionDetector);
 	Anti(ObscuredCheatingDetector);
+	Anti(RoleCheat);
+	Anti(RoleCheatConfig);
+	Anti(NetworkServer_GameCheat);
 
-#define Init(name) name::Init()
+#define InitFunction(name) name::Init(); \
+	LOG_INFO(std::string("初始化->") + #name + "\n");
+	InitFunction(Role);
+	InitFunction(RoleNet);
+	InitFunction(PickItem);
+	InitFunction(CameraMove);
 
 #define ADD(name) \
 	LOG_INFO(std::string("添加->") + #name + "\n"); \
@@ -38,4 +54,6 @@ auto Main::InitFeatures() -> void {
 	ADD(Debug);
 	ADD(WeaponMemory);
 	ADD(Analyze);
+	ADD(CarList);
+	ADD(CarEsp);
 }

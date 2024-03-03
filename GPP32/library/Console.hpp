@@ -37,7 +37,7 @@ namespace console {
 
 	static std::mutex mutex;
 	static auto OutConsole(const OutType type, const std::string& text, const std::string& file, int line) -> void {
-		std::lock_guard lock(mutex);
+		mutex.lock();
 		const auto hWnd_ = GetStdHandle(STD_OUTPUT_HANDLE);
 		switch (type) {
 			case Info: SetConsoleTextAttribute(hWnd_, BACKGROUND_INTENSITY | Green * 16);
@@ -46,7 +46,7 @@ namespace console {
 				SetConsoleTextAttribute(hWnd_, FOREGROUND_INTENSITY | White);
 				std::print("[");
 				SetConsoleTextAttribute(hWnd_, FOREGROUND_INTENSITY | Green);
-				std::print("Info ");
+				std::print("Info");
 				break;
 			case Debug: SetConsoleTextAttribute(hWnd_, BACKGROUND_INTENSITY | Blue * 16);
 				std::print(" ");
@@ -62,7 +62,7 @@ namespace console {
 				SetConsoleTextAttribute(hWnd_, FOREGROUND_INTENSITY | White);
 				std::print("[");
 				SetConsoleTextAttribute(hWnd_, FOREGROUND_INTENSITY | Yellow);
-				std::print("Warn ");
+				std::print("Warning");
 				break;
 			case Error: SetConsoleTextAttribute(hWnd_, BACKGROUND_INTENSITY | Red * 16);
 				std::print(" ");
@@ -79,6 +79,7 @@ namespace console {
 		std::print("{}:{}", file.substr(file.find_last_of('\\') + 1), line);
 		SetConsoleTextAttribute(hWnd_, FOREGROUND_INTENSITY | White);
 		std::print("] :{}", text);
+		mutex.unlock();
 	}
 
 	static auto StartConsole(const wchar_t* title, const bool close) -> HWND {

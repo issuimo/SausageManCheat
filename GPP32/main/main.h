@@ -21,6 +21,7 @@
 #include "../Library/HotKey.hpp"
 #include "../Library/Console.hpp"
 #include "../library/veh.h"
+#include "../library/detours/HookManager.h"
 
 #undef ERROR;
 
@@ -35,6 +36,7 @@ using IT = UnityResolve::Type;
 using IF = UnityResolve::Field;
 using IA = UnityResolve::Assembly;
 using II = UnityResolve::UnityType;
+using HK = HookManager;
 
 class Main {
 public:
@@ -88,7 +90,25 @@ inline static std::string GbkToUtf8(const std::string& str) {
     return cv2.to_bytes(tmp_wstr);
 }
 
-inline static II::Vector3 WorldToScreenPoint(II::Vector3 WorldLocation) {
+inline static std::string Utf8ToGbk(const std::string& str) {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
+    std::wstring tmp_wstr = conv.from_bytes(str);
+    //GBK locale name in windows
+    const char* GBK_LOCALE_NAME = ".936";
+    std::wstring_convert<std::codecvt_byname<wchar_t, char, mbstate_t>> convert(new std::codecvt_byname<wchar_t, char, mbstate_t>(GBK_LOCALE_NAME));
+    return convert.to_bytes(tmp_wstr);
+}
+
+inline static void RotatePoint(const float x, const float y, const float xb, const float yb, const float theta, float& x1, float& y1) {
+    // 将角度转换为弧度
+    const float radian = theta * 3.1415926 / 180.0;
+
+    // 计算旋转后的坐标
+    x1 = (x - xb) * cos(radian) - (y - yb) * sin(radian) + xb;
+    y1 = (y - yb) * cos(radian) + (x - xb) * sin(radian) + yb;
+}
+
+inline static II::Vector3 WorldToScreenPoint(const II::Vector3& WorldLocation) {
     float ViewW = Main::matrix[0][3] * WorldLocation.x + Main::matrix[1][3] * WorldLocation.y + Main::matrix[2][3] * WorldLocation.z + Main::matrix[3][3];
     ViewW = 1 / ViewW;
     float x = Main::windowWidth / 2 + (Main::matrix[0][0] * WorldLocation.x + Main::matrix[1][0] * WorldLocation.y + Main::matrix[2][0] * WorldLocation.z + Main::matrix[3][0]) * ViewW * Main::windowWidth / 2;
@@ -96,7 +116,7 @@ inline static II::Vector3 WorldToScreenPoint(II::Vector3 WorldLocation) {
     return { x, y, ViewW };
 }
 
-inline static auto LoadCol(float r, float g, float b) -> void {
+inline static auto LoadCol(const float r, const float g, const float b) -> void {
     auto& styles = ImGui::GetStyle();
     auto colors = styles.Colors;
 

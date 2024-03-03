@@ -701,7 +701,6 @@ public:
 	char KittyEnemyIDList[0x000004];
 
 	static auto Update() -> void {
-		if (!pClass) pClass = I::Get("Assembly-CSharp.dll")->Get("Role");
 		if (pClass) {
 			std::vector<Role*> temp{};
 			Role* local{};
@@ -733,11 +732,15 @@ public:
 		}
 	}
 
+	static void Init() {
+		pClass = I::Get("Assembly-CSharp.dll")->Get("Role");
+		if (pClass) {
+
+		}
+	}
+
 	inline static std::mutex mutex;
 	inline static Role* localRole;
 	inline static std::vector<Role*> vector;
-	inline static I::Method::MethodPointer<void, void*, II::Vector3> pInit;
-	inline static I::Method::MethodPointer<void, void*, bool> pClear;
-private:
 	inline static I::Class* pClass;
 };

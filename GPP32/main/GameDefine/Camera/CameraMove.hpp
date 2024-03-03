@@ -1,4 +1,5 @@
-﻿#include "../../main.h"
+﻿#pragma once
+#include "../../main.h"
 
 struct CameraMove : II::MonoBehaviour {
 
@@ -228,4 +229,64 @@ struct CameraMove : II::MonoBehaviour {
 	char lookingAt_[0x000003];
 	char lookAtComplete[0x000004];
 
+	static void Init() {
+		pClass = I::Get("Assembly-CSharp.dll")->Get("CameraMove");
+		if (pClass) {
+			awake = pClass->Get<IM>("Init")->Cast<void, CameraMove*>();
+			clear = pClass->Get<IM>("Clear")->Cast<void, CameraMove*>();
+			setLookDir = pClass->Get<IM>("setLookDir")->Cast<void, CameraMove*, float, float>();
+			setPointLocalEulerAngles = pClass->Get<IM>("SetPointLocalEulerAngles")->Cast<void, CameraMove*, II::Vector3>();
+			setLocalEulerAngles = pClass->Get<IM>("SetLocalEulerAngles")->Cast<void, CameraMove*, II::Vector3>();
+			setTranRota = pClass->Get<IM>("SetTranRota")->Cast<void, CameraMove*, II::Quaternion>();
+			setLookTarget = pClass->Get<IM>("setLookTarget")->Cast<void, CameraMove*, II::Transform*>();
+			veh::Hook(awake, Awake);
+			veh::Hook(clear, Clear);
+		}
+	}
+
+	static auto Awake(CameraMove* _this) -> void {
+		veh::CallOriginal<void>(awake, _this);
+		allVector.push_back(_this);
+		return;
+	}
+
+	static auto Clear(CameraMove* _this) -> void {
+		veh::CallOriginal<void>(clear, _this);
+		if (const auto it = std::ranges::find(allVector, _this); it != allVector.end()) {
+			allVector.erase(it);
+		}
+		return;
+	}
+
+	auto SetLookDir(const float xangle, const float yangle) -> void {
+		setLookDir(this, xangle, yangle);
+	}
+
+	auto SetPointLocalEulerAngles(const II::Vector3& angles) -> void {
+		setPointLocalEulerAngles(this, angles);
+	}
+
+	auto SetLocalEulerAngles(const II::Vector3& angles) -> void {
+		setPointLocalEulerAngles(this, angles);
+	}
+
+	auto SetTranRota(const II::Quaternion& rota) -> void {
+		setTranRota(this, rota);
+	}
+
+	auto SetLookTarget(II::Transform* tran) -> void {
+		setLookTarget(this, tran);
+	}
+
+	inline static std::mutex mutex;
+	inline static std::vector<CameraMove*> vector;
+	inline static std::vector<CameraMove*> allVector;
+	inline static I::Class* pClass;
+	inline static IM::MethodPointer<void, CameraMove*> awake;
+	inline static IM::MethodPointer<void, CameraMove*> clear;
+	inline static IM::MethodPointer<void, CameraMove*, float, float> setLookDir;
+	inline static IM::MethodPointer<void, CameraMove*, II::Vector3> setPointLocalEulerAngles;
+	inline static IM::MethodPointer<void, CameraMove*, II::Vector3> setLocalEulerAngles;
+	inline static IM::MethodPointer<void, CameraMove*, II::Quaternion> setTranRota;
+	inline static IM::MethodPointer<void, CameraMove*, II::Transform*> setLookTarget;
 };

@@ -27,6 +27,8 @@ private:
 		bool line;
 		bool bone;
 		bool part;
+		bool weak;
+		bool viewLook;
 		BoxStyle boxStyle{BoxStyle::Quad};
 	}setting;
 };

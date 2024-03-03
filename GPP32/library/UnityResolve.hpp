@@ -1,5 +1,5 @@
 ﻿/*
- * Update: 2024-2-8 13:00
+ * Update: 2024-3-2 22:11
  * Source: https://github.com/issuimo/UnityResolve.hpp
  * Author: github@issuimo
  */
@@ -92,14 +92,15 @@ public:
 			if constexpr (std::is_same_v<RType, Method>) {
 				for (auto pMethod : methods) {
 					if (pMethod->name == name) {
-						if (pMethod->args.size() == 0 && args.size() == 0) {
+						if (pMethod->args.empty() && args.empty()) {
 							return static_cast<RType*>(pMethod);
 						}
 						if (pMethod->args.size() == args.size()) {
 							size_t index{ 0 };
-							for (size_t i { 0 }; const auto & typeName : args)
-							if (typeName == "*" || typeName.empty() ? true : pMethod->args[i++]->pType->name == typeName) {
-								index++;
+							for (size_t i { 0 }; const auto & typeName : args) {
+								if (typeName == "*" || typeName.empty() ? true : pMethod->args[i++]->pType->name == typeName) {
+									index++;
+								}
 							}
 							if (index == pMethod->args.size()) {
 								return static_cast<RType*>(pMethod);
@@ -229,18 +230,16 @@ public:
 			}
 
 			if (mode_ == Mode::Il2Cpp) {
-				if constexpr (std::is_same_v<Return, void>) {
+				if constexpr (std::is_void_v<Return>) {
 					UnityResolve::Invoke<void*>("il2cpp_runtime_invoke", address, obj, argArray, exc);
 					return;
-				}
-				else return *static_cast<Return*>(UnityResolve::Invoke<void*>("il2cpp_runtime_invoke", address, obj, argArray, exc));
+				} else return *static_cast<Return*>(UnityResolve::Invoke<void*>("il2cpp_runtime_invoke", address, obj, argArray, exc));
 			}
 
-			if constexpr (std::is_same_v<Return, void>) {
+			if constexpr (std::is_void_v<Return>) {
 				UnityResolve::Invoke<void*>("mono_runtime_invoke", address, obj, argArray, exc);
 				return;
-			}
-			else return *static_cast<Return*>(UnityResolve::Invoke<void*>("mono_runtime_invoke", address, obj, argArray, exc));
+			} else return *static_cast<Return*>(UnityResolve::Invoke<void*>("mono_runtime_invoke", address, obj, argArray, exc));
 		}
 
 		template <typename Return, typename... Args>
@@ -361,8 +360,8 @@ public:
 					}
 
 					std::string name = field->name;
-					std::replace(name.begin(), name.end(), '<', '_');
-					std::replace(name.begin(), name.end(), '>', '_'); 
+					name.replace(name.begin(), name.end(), '<', '_');
+					name.replace(name.begin(), name.end(), '>', '_');
 
 					if (field->type->name == "System.Int64") {
 						io2 << std::format("\t\tstd::int64_t {};\n", name);
@@ -1294,10 +1293,11 @@ public:
 			wchar_t m_firstChar[32]{};
 
 			[[nodiscard]] auto ToString() const -> std::string {
+				if (!this) { return std::string(); }
 #if WINDOWS_MODE
-				std::string sRet(static_cast<size_t>(m_stringLength) * 3 + 1, '\0');
-				WideCharToMultiByte(CP_UTF8, 0, m_firstChar, m_stringLength, sRet.data(), static_cast<int>(sRet.size()), nullptr, nullptr);
-				return sRet;
+				using convert_typeX = std::codecvt_utf8<wchar_t>;
+				std::wstring_convert<convert_typeX, wchar_t> converterX;
+				return converterX.to_bytes(m_firstChar);
 #elif LINUX_MODE
 				using convert_typeX = std::codecvt_utf8<wchar_t>;
 				std::wstring_convert<convert_typeX, wchar_t> converterX;
@@ -1578,6 +1578,7 @@ public:
 			auto GetComponentsInChildren(Class* pClass) -> std::vector<T> {
 				static Method* method;
 				static void* obj;
+				if (!this) { return std::vector<T>(); }
 				if (!method || !obj) { 
 					method = Get("UnityEngine.CoreModule.dll")->Get("Component")->Get<Method>("GetComponentsInChildren", { "System.Type" });
 					obj = pClass->GetType().GetObject();
@@ -1598,6 +1599,7 @@ public:
 			auto GetComponents(Class* pClass) -> std::vector<T> {
 				static Method* method;
 				static void* obj;
+				if (!this) { return std::vector<T>(); }
 				if (!method || !obj) {
 					method = Get("UnityEngine.CoreModule.dll")->Get("Component")->Get<Method>("GetComponents", { "System.Type" });
 					obj = pClass->GetType().GetObject();
@@ -1618,6 +1620,7 @@ public:
 			auto GetComponentsInParent(Class* pClass) -> std::vector<T> {
 				static Method* method;
 				static void* obj;
+				if (!this) { return std::vector<T>(); }
 				if (!method || !obj) {
 					method = Get("UnityEngine.CoreModule.dll")->Get("Component")->Get<Method>("GetComponentsInParent", { "System.Type" });
 					obj = pClass->GetType().GetObject();
@@ -1748,6 +1751,7 @@ public:
 		struct Transform : Component {
 			auto GetPosition() -> Vector3 {
 				static Method* method;
+				if (!this) { return {}; }
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>(mode_ == Mode::Mono ? "get_position_Injected" : "get_position");
 				if (mode_ == Mode::Mono && method) {
 					const Vector3 vec3{};
@@ -1760,6 +1764,7 @@ public:
 
 			auto SetPosition(const Vector3& position) -> void {
 				static Method* method;
+				if (!this) { return; }
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>(mode_ == Mode::Mono ? "set_position_Injected" : "set_position");
 				if (mode_ == Mode::Mono && method) return method->Invoke<void>(this, &position);
 				if (method) return method->Invoke<void>(this, position);
@@ -1768,6 +1773,7 @@ public:
 
 			auto GetRotation() -> Quaternion {
 				static Method* method;
+				if (!this) { return {}; }
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>(mode_ == Mode::Mono ? "get_rotation_Injected" : "get_rotation");
 				if (mode_ == Mode::Mono && method) {
 					const Quaternion vec3{};
@@ -1780,6 +1786,7 @@ public:
 
 			auto SetRotation(const Quaternion& position) -> void {
 				static Method* method;
+				if (!this) { return; }
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>(mode_ == Mode::Mono ? "set_rotation_Injected" : "set_rotation");
 				if (mode_ == Mode::Mono && method) return method->Invoke<void>(this, &position);
 				if (method) return method->Invoke<void>(this, position);
@@ -1788,6 +1795,7 @@ public:
 
 			auto GetLocalPosition() -> Vector3 {
 				static Method* method;
+				if (!this) { return {}; }
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>(mode_ == Mode::Mono ? "get_localPosition_Injected" : "get_localPosition");
 				if (mode_ == Mode::Mono && method) {
 					const Vector3 vec3{};
@@ -1800,6 +1808,7 @@ public:
 
 			auto SetLocalPosition(const Vector3& position) -> void {
 				static Method* method;
+				if (!this) { return; }
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>(mode_ == Mode::Mono ? "set_localPosition_Injected" : "set_localPosition");
 				if (mode_ == Mode::Mono && method) return method->Invoke<void>(this, &position);
 				if (method) return method->Invoke<void>(this, position);
@@ -1808,6 +1817,7 @@ public:
 
 			auto GetLocalRotation() -> Quaternion {
 				static Method* method;
+				if (!this) { return {}; }
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>(mode_ == Mode::Mono ? "get_localRotation_Injected" : "get_localRotation");
 				if (mode_ == Mode::Mono && method) {
 					const Quaternion vec3{};
@@ -1820,6 +1830,7 @@ public:
 
 			auto SetLocalRotation(const Quaternion& position) -> void {
 				static Method* method;
+				if (!this) { return; }
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>(mode_ == Mode::Mono ? "set_localRotation_Injected" : "set_localRotation");
 				if (mode_ == Mode::Mono && method) return method->Invoke<void>(this, &position);
 				if (method) return method->Invoke<void>(this, position);
@@ -1828,6 +1839,7 @@ public:
 
 			auto GetLocalScale() -> Vector3 {
 				static Method* method;
+				if (!this) { return {}; }
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>(mode_ == Mode::Mono ? "get_localScale_Injected" : "get_localScale");
 				if (mode_ == Mode::Mono && method) {
 					const Vector3 vec3{};
@@ -1840,6 +1852,7 @@ public:
 
 			auto SetLocalScale(const Vector3& position) -> void {
 				static Method* method;
+				if (!this) { return; };
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>(mode_ == Mode::Mono ? "set_localScale_Injected" : "set_localScale");
 				if (mode_ == Mode::Mono && method) return method->Invoke<void>(this, &position);
 				if (method) return method->Invoke<void>(this, position);
@@ -1848,6 +1861,7 @@ public:
 
 			auto GetChildCount() -> int {
 				static Method* method;
+				if (!this) { return 0; }
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>("get_childCount");
 				if (method) return method->Invoke<int>(this);
 				return 0;
@@ -1855,6 +1869,7 @@ public:
 
 			auto GetChild(const int index) -> Transform* {
 				static Method* method;
+				if (!this) { return nullptr; }
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>("GetChild");
 				if (method) return method->Invoke<Transform*>(this, index);
 				return nullptr;
@@ -1862,6 +1877,7 @@ public:
 
 			auto GetRoot() -> Transform* {
 				static Method* method;
+				if (!this) { return nullptr; }
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>("GetRoot");
 				if (method) return method->Invoke<Transform*>(this);
 				return nullptr;
@@ -1869,6 +1885,7 @@ public:
 
 			auto GetParent() -> Transform* {
 				static Method* method;
+				if (!this) { return nullptr; }
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>("GetParent");
 				if (method) return method->Invoke<Transform*>(this);
 				return nullptr;
@@ -1876,6 +1893,7 @@ public:
 
 			auto GetLossyScale() -> Vector3 {
 				static Method* method;
+				if (!this) { return {}; }
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>(mode_ == Mode::Mono ? "get_lossyScale_Injected" : "get_lossyScale");
 				if (mode_ == Mode::Mono && method) {
 					const Vector3 vec3{};
@@ -1888,6 +1906,7 @@ public:
 
 			auto TransformPoint(const Vector3& position) -> Vector3 {
 				static Method* method;
+				if (!this) { return {}; }
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>(mode_ == Mode::Mono ? "TransformPoint_Injected" : "TransformPoint");
 				if (mode_ == Mode::Mono && method) {
 					const Vector3 vec3{};
@@ -1900,6 +1919,7 @@ public:
 
 			auto LookAt(const Vector3& worldPosition) -> void {
 				static Method* method;
+				if (!this) { return; }
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>("LookAt", { "Vector3" });
 				if (method) return method->Invoke<void>(this, worldPosition);
 				return;
@@ -1907,6 +1927,7 @@ public:
 
 			auto Rotate(const Vector3& eulers) -> void {
 				static Method* method;
+				if (!this) { return; }
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>("Rotate", { "Vector3" });
 				if (method) return method->Invoke<void>(this, eulers);
 				return;
@@ -1941,18 +1962,52 @@ public:
 				throw std::logic_error("nullptr");
 			}
 
-			auto GetTransform() -> Transform* {
+			auto GetActive() -> bool {
 				static Method* method;
-				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("get_transform");
-				if (method) return method->Invoke<Transform*>(this);
-				throw std::logic_error("nullptr");
+				if (!this) { return false; };
+				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("get_active");
+				if (method) return method->Invoke<bool>(this);
+				return false;
+			}
+
+			auto SetActive(bool value) -> void {
+				static Method* method;
+				if (!this) { return; };
+				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("set_active");
+				if (method) return method->Invoke<void>(this, value);
+				return;
+			}
+
+			auto GetActiveSelf() -> bool {
+				static Method* method;
+				if (!this) { return false; };
+				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("get_activeSelf");
+				if (method) return method->Invoke<bool>(this);
+				return false;
+			}
+
+			auto GetActiveInHierarchy() -> bool {
+				static Method* method;
+				if (!this) { return false; };
+				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("get_activeInHierarchy");
+				if (method) return method->Invoke<bool>(this);
+				return false;
 			}
 
 			auto GetIsStatic() -> bool {
 				static Method* method;
+				if (!this) { return false; };
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("get_isStatic");
 				if (method) return method->Invoke<bool>(this);
-				throw std::logic_error("nullptr");
+				return false;
+			}
+
+			auto GetTransform() -> Transform* {
+				static Method* method;
+				if (!this) { return nullptr; };
+				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("get_transform");
+				if (method) return method->Invoke<Transform*>(this);
+				return nullptr;
 			}
 
 			auto GetTag() -> String* {
@@ -2253,9 +2308,10 @@ public:
 
 			auto GetBoneTransform(const HumanBodyBones humanBoneId) -> Transform* {
 				static Method* method;
+				if (!this) { return nullptr; }
 				if (!method) method = Get("UnityEngine.AnimationModule.dll")->Get("Animator")->Get<Method>("GetBoneTransform");
 				if (method) return method->Invoke<Transform*>(this, humanBoneId);
-				throw std::logic_error("nullptr");
+				return nullptr;
 			}
 		};
 

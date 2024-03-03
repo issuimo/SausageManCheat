@@ -132,6 +132,8 @@
     <ClCompile Include="library\imgui\implot_items.cpp" />
     <ClCompile Include="library\veh.cpp" />
     <ClCompile Include="main\features.cpp" />
+    <ClCompile Include="main\features\cars\esp\CarEsp.cpp" />
+    <ClCompile Include="main\features\cars\list\CarList.cpp" />
     <ClCompile Include="main\features\memory\player\PlayerMemory.cpp" />
     <ClCompile Include="main\features\memory\weapon\WeaponMemory.cpp" />
     <ClCompile Include="main\features\player\aim\PlayerAim.cpp" />
@@ -148,6 +150,8 @@
   <ItemGroup>
     <ClInclude Include="library\Console.hpp" />
     <ClInclude Include="library\d3d11Hook.h" />
+    <ClInclude Include="library\detours\detours.h" />
+    <ClInclude Include="library\detours\HookManager.h" />
     <ClInclude Include="library\HotKey.hpp" />
     <ClInclude Include="library\imgui\Font.h" />
     <ClInclude Include="library\imgui\imconfig.h" />
@@ -163,6 +167,8 @@
     <ClInclude Include="library\json.hpp" />
     <ClInclude Include="library\UnityResolve.hpp" />
     <ClInclude Include="library\veh.h" />
+    <ClInclude Include="main\features\cars\esp\CarEsp.h" />
+    <ClInclude Include="main\features\cars\list\CarList.h" />
     <ClInclude Include="main\features\memory\player\PlayerMemory.h" />
     <ClInclude Include="main\features\memory\weapon\WeaponMemory.h" />
     <ClInclude Include="main\features\player\aim\PlayerAim.h" />
@@ -174,9 +180,34 @@
     <ClInclude Include="main\features\setting\debug.h" />
     <ClInclude Include="main\features\setting\setting.h" />
     <ClInclude Include="main\GameDefine\Animator\AnimatorControl.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\CmdCheckRoleSize.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\InjectionDetectedEventHandler.h" />
     <ClInclude Include="main\GameDefine\AntiCheat\InjectionDetector.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\NetworkServer_GameCheat.h" />
     <ClInclude Include="main\GameDefine\AntiCheat\ObscuredCheatingDetector.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheat.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatAction.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatBullet.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatBulletFireData.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatCar.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatCollider.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatConfig.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatHolySword.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatJump.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatKill.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatMeleeAttackData.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatMove.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatMTP.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatPoint.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatUseItem.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatWave.h" />
+    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatWeapon.h" />
     <ClInclude Include="main\GameDefine\Camera\CameraMove.hpp" />
+    <ClInclude Include="main\GameDefine\Car\Car.h" />
+    <ClInclude Include="main\GameDefine\Car\CarNet.h" />
+    <ClInclude Include="main\GameDefine\Car\SOCarDataConfig.h" />
+    <ClInclude Include="main\GameDefine\Network\IGameWorldMessage.h" />
+    <ClInclude Include="main\GameDefine\Network\NetworkBase.h" />
     <ClInclude Include="main\GameDefine\Pickitem\PickItem.h" />
     <ClInclude Include="main\GameDefine\Pickitem\PickItemDataConfig.h" />
     <ClInclude Include="main\GameDefine\Pickitem\PickItemNet.h" />
@@ -185,11 +216,17 @@
     <ClInclude Include="main\GameDefine\Role\RoleControl.h" />
     <ClInclude Include="main\GameDefine\Role\RoleControlBase.h" />
     <ClInclude Include="main\GameDefine\Role\RoleLogic.h" />
+    <ClInclude Include="main\GameDefine\Role\RoleLogicServer.h" />
+    <ClInclude Include="main\GameDefine\Role\RoleNet.h" />
     <ClInclude Include="main\GameDefine\Weapon\BulletSpeedAndGravity.h" />
     <ClInclude Include="main\GameDefine\Weapon\SOWeaponControl.h" />
     <ClInclude Include="main\GameDefine\Weapon\UpRecoilInfo.h" />
     <ClInclude Include="main\main.h" />
     <ClInclude Include="main\features\player\list\PlayerList.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="library\detours\[x64]detours.lib" />
+    <Library Include="library\detours\[x86]detours.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

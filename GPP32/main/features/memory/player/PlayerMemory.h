@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "../../../main.h"
 class PlayerMemory : public Feature {
 public:
@@ -14,6 +14,10 @@ public:
 
 	static auto GetInstance() -> PlayerMemory*;
 private:
-
+	bool enable;
+	struct {
+		bool enable;
+		float v = 1;
+	}scale;
 };
 

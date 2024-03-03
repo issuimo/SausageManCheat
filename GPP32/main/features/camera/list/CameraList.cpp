@@ -1,4 +1,7 @@
 ﻿#include "CameraList.h"
+
+#include "../../../GameDefine/Camera/CameraMove.hpp"
+
 auto CameraList::GetInfo() const -> const GuiInfo& { return *new GuiInfo{ (const char*)u8"相机", (const char*)u8"列表", true, false, false }; }
 void CameraList::Draw() { Feature::Draw(); }
 void CameraList::Render() {
@@ -23,6 +26,38 @@ void CameraList::Render() {
 			try {
 				if (ImGui::TableSetColumnIndex(0)) ImGui::Text(std::format("{:X}", reinterpret_cast<std::uint64_t>(camera)).c_str());
 				if (ImGui::TableSetColumnIndex(1)) ImGui::Text(std::format("{}", camera->GetDepth()).c_str());
+			}
+			catch (...) {
+				ERROR("")
+			}
+			ImGui::PopID();
+		}
+
+		ImGui::EndTable();
+	}
+
+	if (ImGui::BeginTable("CameraList2", 3,
+		ImGuiTableFlags_ScrollX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY |
+		ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV |
+		ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable,
+		ImVec2(0.0F, ImGui::GetTextLineHeightWithSpacing() * 8))) {
+		ImGui::TableSetupScrollFreeze(1, 1);
+		ImGui::TableSetupColumn((const char*)u8"地址", ImGuiTableColumnFlags_None);
+		ImGui::TableSetupColumn((const char*)u8"xyRot", ImGuiTableColumnFlags_None);
+		ImGui::TableSetupColumn((const char*)u8"mxyRot", ImGuiTableColumnFlags_None);
+		ImGui::TableHeadersRow();
+
+		for (const auto& camera : CameraMove::allVector) {
+			ImGui::TableNextRow();
+			ImGui::PushID(camera);
+			try {
+				if (ImGui::TableSetColumnIndex(0)) ImGui::Text(std::format("{:X}", reinterpret_cast<std::uint64_t>(camera)).c_str());
+				if (ImGui::TableSetColumnIndex(1)) ImGui::Text(std::format("{} | {}", camera->_xRot, camera->_yRot).c_str());
+				if (ImGui::TableSetColumnIndex(2)) {
+					if (ImGui::Button("ok")) {
+						
+					}
+				}
 			}
 			catch (...) {
 				ERROR("")

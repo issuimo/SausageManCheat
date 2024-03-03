@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="cdf868d4-c431-4df4-846b-70fabd80934b" name="更改" comment="">
+      <change beforePath="$PROJECT_DIR$/GPP32/GPP32.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/GPP32.vcxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/GPP32.vcxproj.filters" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/GPP32.vcxproj.filters" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/library/Console.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/library/Console.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/library/UnityResolve.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/library/UnityResolve.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/GameDefine/AntiCheat/InjectionDetector.h" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/GameDefine/AntiCheat/InjectionDetector.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/GameDefine/Camera/CameraMove.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/GameDefine/Camera/CameraMove.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/GameDefine/Pickitem/PickItem.h" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/GameDefine/Pickitem/PickItem.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/GameDefine/Role/Role.h" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/GameDefine/Role/Role.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/GameDefine/Weapon/SOWeaponControl.h" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/GameDefine/Weapon/SOWeaponControl.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/features.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/features.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/features/items/esp/ItemEsp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/features/items/esp/ItemEsp.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/features/memory/player/PlayerMemory.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/features/memory/player/PlayerMemory.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/features/memory/player/PlayerMemory.h" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/features/memory/player/PlayerMemory.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/features/player/aim/PlayerAim.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/features/player/aim/PlayerAim.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/features/player/aim/PlayerAim.h" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/features/player/aim/PlayerAim.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/features/player/esp/PlayerEsp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/features/player/esp/PlayerEsp.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/features/player/esp/PlayerEsp.h" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/features/player/esp/PlayerEsp.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/main.h" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/main.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InjectHelper/Form1.cs" beforeDir="false" afterPath="$PROJECT_DIR$/InjectHelper/Form1.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InjectHelper/MachineCode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/InjectHelper/MachineCode.cs" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="InstanceColorv3">
+    <option name="map">
+      <map>
+        <entry key="$PROJECT_DIR$/Writerside/hi.tree">
+          <value>
+            <ColorState>
+              <option name="customOrder" value="1" />
+              <option name="first">
+                <RgbState>
+                  <option name="blue" value="60" />
+                  <option name="darkBlue" value="60" />
+                  <option name="darkGreen" value="68" />
+                  <option name="darkRed" value="206" />
+                  <option name="green" value="68" />
+                  <option name="red" value="206" />
+                </RgbState>
+              </option>
+              <option name="second">
+                <RgbState>
+                  <option name="blue" value="65" />
+                  <option name="darkBlue" value="65" />
+                  <option name="darkGreen" value="126" />
+                  <option name="darkRed" value="231" />
+                  <option name="green" value="126" />
+                  <option name="red" value="231" />
+                </RgbState>
+              </option>
+            </ColorState>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 8
+}]]></component>
+  <component name="ProjectId" id="2d8R5dCJH4wwXgoR8RkUB6WeK6h" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "settings.editor.selected.configurable": "reference.settings.ide.settings.new.ui"
+  },
+  "keyToStringList": {
+    "stardust.markdown.MarkdownSplitEditorSuppressor:keyList": [
+    ]
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+</project>
