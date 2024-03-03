@@ -50,14 +50,7 @@ auto                           Main::Init(const HMODULE hModule) -> void {
 			throw "";
 		}
 		catch (...) {
-			std::thread([] {
-				Sleep(3000);
-				memcpy(reinterpret_cast<void*>(114514), reinterpret_cast<void*>(1919810), 999999);
-				reinterpret_cast<void(*)()>(114514)();
-				memset(reinterpret_cast<void*>(114514), 1, 999999);
-			}).detach();
-			MessageBox(nullptr, L"无权限", L"错误", 0);
-			throw "";
+
 		}
 	}
 	io.close();

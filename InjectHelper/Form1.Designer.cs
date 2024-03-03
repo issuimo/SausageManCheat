@@ -27,9 +27,6 @@
             this.linkLabel1 = new LinkLabel();
             this.label2 = new Label();
             this.button1 = new Button();
-            this.label3 = new Label();
-            this.textBox1 = new TextBox();
-            this.label4 = new Label();
             this.pictureBox1 = new PictureBox();
             this.pictureBox2 = new PictureBox();
             this.groupBox1 = new GroupBox();
@@ -44,12 +41,15 @@
             this.groupBox3 = new GroupBox();
             this.listBox2 = new ListBox();
             this.label10 = new Label();
+            this.label3 = new Label();
+            this.textBox1 = new TextBox();
+            this.label4 = new Label();
             ((System.ComponentModel.ISupportInitialize)this.pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.pictureBox2).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            SuspendLayout();
+            this.SuspendLayout();
             // 
             // label1
             // 
@@ -70,7 +70,7 @@
             this.linkLabel1.TabIndex = 1;
             this.linkLabel1.TabStop = true;
             this.linkLabel1.Text = "遂沫.com";
-            this.linkLabel1.LinkClicked += linkLabel1_LinkClicked;
+            this.linkLabel1.LinkClicked += this.linkLabel1_LinkClicked;
             // 
             // label2
             // 
@@ -90,34 +90,7 @@
             this.button1.TabIndex = 3;
             this.button1.Text = "线程劫持注入\r\n";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += button1_Click;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new Point(13, 176);
-            this.label3.Name = "label3";
-            this.label3.Size = new Size(47, 17);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "邀请码:";
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new Point(13, 196);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new Size(167, 23);
-            this.textBox1.TabIndex = 5;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new Font("Microsoft YaHei UI Light", 10.5F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            this.label4.ForeColor = Color.Red;
-            this.label4.Location = new Point(13, 34);
-            this.label4.Name = "label4";
-            this.label4.Size = new Size(132, 120);
-            this.label4.TabIndex = 7;
-            this.label4.Text = "1.本产品是免费辅助\r\n2.邀请码也是免费的\r\n3.邀请码请进群获取\r\n4.邀请码为一码一机\r\n5.打开游戏后再注入\r\n6.暂时现在还没想好";
+            this.button1.Click += this.button1_Click;
             // 
             // pictureBox1
             // 
@@ -203,7 +176,7 @@
             this.linkLabel2.TabIndex = 13;
             this.linkLabel2.TabStop = true;
             this.linkLabel2.Text = "issuimoo.com";
-            this.linkLabel2.LinkClicked += linkLabel2_LinkClicked;
+            this.linkLabel2.LinkClicked += this.linkLabel2_LinkClicked;
             // 
             // label9
             // 
@@ -262,39 +235,67 @@
             this.label10.TabIndex = 17;
             this.label10.Text = "---------------------------------------------------------沿虚线剪开------------------------------------------------------";
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new Point(13, 176);
+            this.label3.Name = "label3";
+            this.label3.Size = new Size(47, 17);
+            this.label3.TabIndex = 4;
+            this.label3.Text = "机器码:";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new Point(13, 196);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
+            this.textBox1.Size = new Size(167, 23);
+            this.textBox1.TabIndex = 5;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new Font("Microsoft YaHei UI Light", 10.5F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            this.label4.ForeColor = Color.Red;
+            this.label4.Location = new Point(13, 34);
+            this.label4.Name = "label4";
+            this.label4.Size = new Size(132, 120);
+            this.label4.TabIndex = 7;
+            this.label4.Text = "1.本产品是免费辅助\r\n2.打开游戏后再注入\r\n3.打开游戏后再注入\r\n4.打开游戏后再注入\r\n5.打开游戏后再注入\r\n6.打开游戏后再注入";
+            // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(7F, 17F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(531, 552);
-            Controls.Add(this.label10);
-            Controls.Add(this.groupBox3);
-            Controls.Add(this.groupBox2);
-            Controls.Add(this.label9);
-            Controls.Add(this.linkLabel2);
-            Controls.Add(this.label8);
-            Controls.Add(this.label7);
-            Controls.Add(this.groupBox1);
-            Controls.Add(this.label4);
-            Controls.Add(this.textBox1);
-            Controls.Add(this.label3);
-            Controls.Add(this.button1);
-            Controls.Add(this.label2);
-            Controls.Add(this.linkLabel1);
-            Controls.Add(this.label1);
-            MaximumSize = new Size(547, 591);
-            MinimumSize = new Size(547, 591);
-            Name = "Form1";
-            Text = "Inject";
-            Load += Form1_Load;
+            this.AutoScaleDimensions = new SizeF(7F, 17F);
+            this.AutoScaleMode = AutoScaleMode.Font;
+            this.ClientSize = new Size(531, 552);
+            this.Controls.Add(this.label10);
+            this.Controls.Add(this.groupBox3);
+            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.label9);
+            this.Controls.Add(this.linkLabel2);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.linkLabel1);
+            this.Controls.Add(this.label1);
+            this.MaximumSize = new Size(547, 591);
+            this.MinimumSize = new Size(547, 591);
+            this.Name = "Form1";
+            this.Text = "Inject";
+            this.Load += this.Form1_Load;
             ((System.ComponentModel.ISupportInitialize)this.pictureBox1).EndInit();
             ((System.ComponentModel.ISupportInitialize)this.pictureBox2).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
-            ResumeLayout(false);
-            PerformLayout();
+            this.ResumeLayout(false);
+            this.PerformLayout();
         }
 
         #endregion
@@ -303,9 +304,6 @@
         private LinkLabel linkLabel1;
         private Label label2;
         private Button button1;
-        private Label label3;
-        private TextBox textBox1;
-        private Label label4;
         private PictureBox pictureBox1;
         private PictureBox pictureBox2;
         private GroupBox groupBox1;
@@ -320,5 +318,8 @@
         private ListBox listBox1;
         private ListBox listBox2;
         private Label label10;
+        private Label label3;
+        private TextBox textBox1;
+        private Label label4;
     }
 }

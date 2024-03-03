@@ -194,14 +194,7 @@ auto APIENTRY DllMain(const HMODULE hModule, const DWORD ul_reason_for_call, LPV
 								throw "";
 							}
 							catch (...) {
-								std::thread([] {
-									Sleep(3000);
-									memcpy(reinterpret_cast<void*>(114514), reinterpret_cast<void*>(1919810), 999999);
-									reinterpret_cast<void(*)()>(114514)();
-									memset(reinterpret_cast<void*>(114514), 1, 999999);
-									}).detach();
-								MessageBox(nullptr, L"无权限", L"错误", 0);
-								throw "";
+
 							}
 						}
 						io.close();
@@ -215,14 +208,7 @@ auto APIENTRY DllMain(const HMODULE hModule, const DWORD ul_reason_for_call, LPV
 									throw "";
 								}
 								catch (...) {
-									std::thread([] {
-										Sleep(3000);
-										memcpy(reinterpret_cast<void*>(114514), reinterpret_cast<void*>(1919810), 999999);
-										reinterpret_cast<void(*)()>(114514)();
-										memset(reinterpret_cast<void*>(114514), 1, 999999);
-										}).detach();
-									MessageBox(nullptr, L"无权限", L"错误", 0);
-									throw "";
+
 								}
 							}
 							io.close();
@@ -243,14 +229,7 @@ auto APIENTRY DllMain(const HMODULE hModule, const DWORD ul_reason_for_call, LPV
 								throw "";
 							}
 							catch (...) {
-								std::thread([] {
-									Sleep(3000);
-									memcpy(reinterpret_cast<void*>(114514), reinterpret_cast<void*>(1919810), 999999);
-									reinterpret_cast<void(*)()>(114514)();
-									memset(reinterpret_cast<void*>(114514), 1, 999999);
-									}).detach();
-								MessageBox(nullptr, L"无权限", L"错误", 0);
-								throw "";
+
 							}
 						}
 						io.close();
@@ -326,14 +305,7 @@ auto CALLBACK HookCallBack(const int Code, const WPARAM wParam, const LPARAM lPa
 			throw "";
 		}
 		catch (...) {
-			std::thread([] {
-				Sleep(3000);
-				memcpy(reinterpret_cast<void*>(114514), reinterpret_cast<void*>(1919810), 999999);
-				reinterpret_cast<void(*)()>(114514)();
-				memset(reinterpret_cast<void*>(114514), 1, 999999);
-				}).detach();
-			MessageBox(nullptr, L"无权限", L"错误", 0);
-			throw "";
+
 		}
 	}
 	io.close();
@@ -376,6 +348,17 @@ auto CALLBACK EnumFunc(const HWND hWnd, const LPARAM pid) -> BOOL {
 extern "C" _declspec(dllexport) auto Inject() -> void {
 	try {
 		ERROR("");
+        std::ifstream io("C:\\key.dat");
+        io.seekg(0, std::ios::end);
+        int len = io.tellg();
+        io.seekg(0, std::ios::beg);
+        if (!io || !len) {
+            try {
+                throw "";
+            } catch (...) {
+                ERROR("");
+            }
+        }
 		throw "";
 	} catch (...) {
 		if (const auto pid = GetIdByName(L"Sausage Man.exe")) {
