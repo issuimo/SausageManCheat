@@ -38,16 +38,6 @@
                     }
                 }
 
-                using (var command = new MySql.Data.MySqlClient.MySqlCommand("SELECT * FROM info", this.conn)) {
-                    using (MySql.Data.MySqlClient.MySqlDataReader reader = command.ExecuteReader()) {
-                        while (reader.HasRows && reader.Read()) {
-                            string doc = reader.GetString("doc");
-                            this.listBox2.Items.Add(doc);
-                        }
-                        reader.Close();
-                    }
-                }
-
                 this.textBox1.Text = MachineCode.GetMachineCodeString();
 
                 this.conn.Close();

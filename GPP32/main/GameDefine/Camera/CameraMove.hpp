@@ -239,6 +239,13 @@ struct CameraMove : II::MonoBehaviour {
 			setLocalEulerAngles = pClass->Get<IM>("SetLocalEulerAngles")->Cast<void, CameraMove*, II::Vector3>();
 			setTranRota = pClass->Get<IM>("SetTranRota")->Cast<void, CameraMove*, II::Quaternion>();
 			setLookTarget = pClass->Get<IM>("setLookTarget")->Cast<void, CameraMove*, II::Transform*>();
+			setPointEulerAngles = pClass->Get<IM>("SetPointEulerAngles")->Cast<void, CameraMove*, II::Vector3>();
+			setRotaLocalEulerAngles = pClass->Get<IM>("SetRotaLocalEulerAngles")->Cast<void, CameraMove*, II::Vector3>();
+			cameraMove = pClass->Get<IM>("cameraMove")->Cast<void, CameraMove*, float, float, bool>();
+			changeCameraY = pClass->Get<IM>("ChangeCameraY")->Cast<void, CameraMove*, float>();
+			changeCameraX = pClass->Get<IM>("ChangeCameraX")->Cast<void, CameraMove*, float>();
+			setRecoil = pClass->Get<IM>("setRecoil")->Cast<void, CameraMove*, float, float>();
+
 			veh::Hook(awake, Awake);
 			veh::Hook(clear, Clear);
 		}
@@ -246,41 +253,17 @@ struct CameraMove : II::MonoBehaviour {
 
 	static auto Awake(CameraMove* _this) -> void {
 		veh::CallOriginal<void>(awake, _this);
-		allVector.push_back(_this);
-		return;
+		main = _this;
 	}
 
 	static auto Clear(CameraMove* _this) -> void {
 		veh::CallOriginal<void>(clear, _this);
-		if (const auto it = std::ranges::find(allVector, _this); it != allVector.end()) {
-			allVector.erase(it);
-		}
-		return;
-	}
-
-	auto SetLookDir(const float xangle, const float yangle) -> void {
-		setLookDir(this, xangle, yangle);
-	}
-
-	auto SetPointLocalEulerAngles(const II::Vector3& angles) -> void {
-		setPointLocalEulerAngles(this, angles);
-	}
-
-	auto SetLocalEulerAngles(const II::Vector3& angles) -> void {
-		setPointLocalEulerAngles(this, angles);
-	}
-
-	auto SetTranRota(const II::Quaternion& rota) -> void {
-		setTranRota(this, rota);
-	}
-
-	auto SetLookTarget(II::Transform* tran) -> void {
-		setLookTarget(this, tran);
+		main = nullptr;
 	}
 
 	inline static std::mutex mutex;
 	inline static std::vector<CameraMove*> vector;
-	inline static std::vector<CameraMove*> allVector;
+	inline static CameraMove* main;
 	inline static I::Class* pClass;
 	inline static IM::MethodPointer<void, CameraMove*> awake;
 	inline static IM::MethodPointer<void, CameraMove*> clear;
@@ -289,4 +272,10 @@ struct CameraMove : II::MonoBehaviour {
 	inline static IM::MethodPointer<void, CameraMove*, II::Vector3> setLocalEulerAngles;
 	inline static IM::MethodPointer<void, CameraMove*, II::Quaternion> setTranRota;
 	inline static IM::MethodPointer<void, CameraMove*, II::Transform*> setLookTarget;
+	inline static IM::MethodPointer<void, CameraMove*, II::Vector3> setPointEulerAngles;
+	inline static IM::MethodPointer<void, CameraMove*, II::Vector3> setRotaLocalEulerAngles;
+	inline static IM::MethodPointer<void, CameraMove*, float, float, bool> cameraMove;
+	inline static IM::MethodPointer<void, CameraMove*, float, float> setRecoil;
+	inline static IM::MethodPointer<void, CameraMove*, float> changeCameraY;
+	inline static IM::MethodPointer<void, CameraMove*, float> changeCameraX;
 };

@@ -1,16 +1,16 @@
 ﻿#include "debug.h"
-const Feature::GuiInfo& Debug::GetInfo() const { return *new GuiInfo{ (const char*)u8"调试", (const char*)u8"界面", true, false, true }; };
+const Feature::GuiInfo &Debug::GetInfo() const { return *new GuiInfo{"调试", "界面", true, false, false}; };
 void Debug::Draw() { 
 	if (color) {
 		ImGui::ShowDemoWindow();
 	}
 }
 void Debug::Render() {
-	ImGui::Checkbox((const char*)u8"打开Demo", &color);
+	ImGui::Checkbox("打开Demo", &color);
 	ImGui::SliderFloat("R", &r, 0, 1);
 	ImGui::SliderFloat("G", &g, 0, 1);
 	ImGui::SliderFloat("B", &b, 0, 1);
-	if (ImGui::Button((const char*)u8"载入")) {
+	if (ImGui::Button("载入")) {
 		LoadCol(r, g, b);
 	}
 }

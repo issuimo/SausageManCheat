@@ -8,8 +8,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e99ae342-9b8c-42f1-92ed-4860e66cbbc3" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/GPP32/dllmain.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/dllmain.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GPP32/main/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/features/cars/esp/CarEsp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/features/cars/esp/CarEsp.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/features/items/esp/ItemEsp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/features/items/esp/ItemEsp.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPP32/main/features/player/esp/PlayerEsp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GPP32/main/features/player/esp/PlayerEsp.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/InjectHelper/Form1.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/InjectHelper/Form1.Designer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/InjectHelper/Form1.cs" beforeDir="false" afterPath="$PROJECT_DIR$/InjectHelper/Form1.cs" afterDir="false" />
     </list>
@@ -75,6 +76,7 @@
       <workItem from="1709437235823" duration="20000" />
       <workItem from="1709437264477" duration="1041000" />
       <workItem from="1709444053468" duration="72000" />
+      <workItem from="1709450145080" duration="41000" />
     </task>
     <servers />
   </component>

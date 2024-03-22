@@ -131,26 +131,21 @@ struct Car : II::MonoBehaviour {
 		if (!pClass) pClass = I::Get("Assembly-CSharp.dll")->Get("Car");
 		if (pClass) {
 			std::vector<Car*> temp{};
-			Car* local{};
-			try {
-				[&]() {
-					__try {
-						[&]() {
-							for (const auto pRole : pClass->FindObjectsByType<Car*>()) {
-								if (!IsBadReadPtr(pRole, sizeof(Car))) {
-									temp.push_back(pRole);
-								}
-							}
-						}();
-					} __except (EXCEPTION_EXECUTE_HANDLER) {
-						[]() {
-							ERROR("Car-FindObjectsByType (except)");
-						}();
-					}
-				}();
-			} catch (...) {
-				ERROR("Car-FindObjectsByType (catch)");
-			}
+			[&]() {
+                __try {
+                    [&]() {
+                        for (const auto pRole : pClass->FindObjectsByType<Car *>()) {
+                            if (!IsBadReadPtr(pRole, sizeof(Car))) {
+                                temp.push_back(pRole);
+                            }
+                        }
+                    }();
+                } __except (EXCEPTION_EXECUTE_HANDLER) {
+                    []() {
+                        ERROR("Car-FindObjectsByType (except)");
+                    }();
+                }
+            }();
 			std::lock_guard lock(mutex);
 			vector = temp;
 		}

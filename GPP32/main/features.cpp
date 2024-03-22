@@ -2,10 +2,7 @@
 
 #include "GameDefine/AntiCheat/InjectionDetector.h"
 #include "GameDefine/AntiCheat/ObscuredCheatingDetector.h"
-#include "GameDefine/AntiCheat/RoleCheat.h"
-#include "GameDefine/AntiCheat/RoleCheatConfig.h"
 #include "GameDefine/Role/RoleNet.h"
-#include "GameDefine/AntiCheat/NetworkServer_GameCheat.h"
 #include "GameDefine/Camera/CameraMove.hpp"
 #include "GameDefine/Pickitem/PickItem.h"
 
@@ -29,15 +26,10 @@ auto Main::InitFeatures() -> void {
 	name::AntiStartDetection()
 	Anti(InjectionDetector);
 	Anti(ObscuredCheatingDetector);
-	Anti(RoleCheat);
-	Anti(RoleCheatConfig);
-	Anti(NetworkServer_GameCheat);
 
 #define InitFunction(name) name::Init(); \
 	LOG_INFO(std::string("初始化->") + #name + "\n");
 	InitFunction(Role);
-	InitFunction(RoleNet);
-	InitFunction(PickItem);
 	InitFunction(CameraMove);
 
 #define ADD(name) \

@@ -4,118 +4,106 @@
 
 #include "../../setting/analyze.h"
 
-auto ItemEsp::GetInfo() const -> const GuiInfo& { return *new GuiInfo{ reinterpret_cast<const char*>(u8"物品"), reinterpret_cast<const char*>(u8"透视"), true, false, true }; }
+auto ItemEsp::GetInfo() const -> const GuiInfo& { return *new GuiInfo{ ("物品"), ("透视"), true, false, true }; }
 void ItemEsp::Draw() {
 	if (enable) {
 		std::lock_guard lock(PickItem::mutex);
 		std::lock_guard lock2(Role::mutex);
 		const auto bg = ImGui::GetBackgroundDrawList();
-		TIME_LOCK;
-		try {
-			[&]() {
-				__try {
-					[&]() {
-						II::Vector3 mPoint{}; {
-							if (Role::localRole && !IsBadReadPtr(Role::localRole, sizeof(RoleLogic))) {
-								mPoint = Role::localRole->roleLogic->NowPoint;
-							}
-						}
-						TIME_START(1);
-						std::vector<std::vector<Item>> list;
-						std::vector<Item> tempList;
-						tempList.reserve(PickItem::vector.size());
-						list.reserve(5);
-						for (const auto& obj : PickItem::vector) {
-							if (!IsBadReadPtr(obj, sizeof(PickItem)) && !IsBadReadPtr(obj->pickItemData, sizeof(PickItemDataConfig)) && !IsBadReadPtr(obj->MyPickItemNet, sizeof(PickItemNet))) {
-								auto sPoint = WorldToScreenPoint(obj->MyPickItemNet->SyncPoint);
-								if (sPoint.z < 0) continue;
-								auto nPoint = obj->MyPickItemNet->SyncPoint;
-								Item item;
-								item.name = obj->pickItemData->itemName;
-								ItemInfo info;
-								info.show = false;
-								info = itemInfoList[item.name->ToString()];
-								if (info.show) {
-									item.color    = info.color;
-									item.distance = static_cast<int>(sqrt(pow(nPoint.x - mPoint.x, 2) + pow(nPoint.y - mPoint.y, 2) + pow(nPoint.z - mPoint.z, 2)));
-									item.sPoint   = DrawHelp::BoxScreen::ToVec2(sPoint);
-									item.hasGroup = false;
-									tempList.push_back(item);
-								}
-							}
-						}
-						TIME_END(1);
-						TIME_UPDATA("ItemEsp::PickItem::vector", 1);
+        [&]() {
+            __try {
+                [&]() {
+                    II::Vector3 mPoint{};
+                    {
+                        if (Role::localRole && !IsBadReadPtr(Role::localRole, sizeof(RoleLogic))) {
+                            mPoint = Role::localRole->roleLogic->NowPoint;
+                        }
+                    }
 
-						TIME_START(2);
-						for (size_t i = 0; i < tempList.size(); i++) {
-							if (tempList[i].hasGroup) {
-								continue;
-							}
-							std::vector<Item> temp;
-							temp.reserve(tempList.size() - i);
-							for (size_t j = i + 1; j < tempList.size(); j++) {
-								if (tempList[j].hasGroup) continue;
-								if (sqrt(pow(tempList[i].sPoint.x - tempList[j].sPoint.x, 2) + pow(tempList[i].sPoint.y - tempList[j].sPoint.y, 2)) < 150.0f) {
-									tempList[j].hasGroup = true;
-									temp.push_back(tempList[j]);
-								}
-							}
-							list.push_back(temp);
-						}
-						TIME_END(2);
-						TIME_UPDATA("ItemEsp::PickItem::group", 2);
+                    std::vector<std::vector<Item>> list;
+                    std::vector<Item>              tempList;
+                    tempList.reserve(PickItem::vector.size());
+                    list.reserve(5);
+                    for (const auto &obj : PickItem::vector) {
+                        if (!IsBadReadPtr(obj, sizeof(PickItem)) && !IsBadReadPtr(obj->pickItemData, sizeof(PickItemDataConfig)) && !IsBadReadPtr(obj->MyPickItemNet, sizeof(PickItemNet))) {
+                            auto sPoint = WorldToScreenPoint(obj->MyPickItemNet->SyncPoint);
+                            if (sPoint.z < 0) continue;
+                            auto nPoint = obj->MyPickItemNet->SyncPoint;
+                            Item item;
+                            item.name = obj->pickItemData->itemName;
+                            ItemInfo info;
+                            info.show = false;
+                            info      = itemInfoList[item.name->ToString()];
+                            if (info.show) {
+                                item.color    = info.color;
+                                item.distance = static_cast<int>(sqrt(pow(nPoint.x - mPoint.x, 2) + pow(nPoint.y - mPoint.y, 2) + pow(nPoint.z - mPoint.z, 2)));
+                                item.sPoint   = DrawHelp::BoxScreen::ToVec2(sPoint);
+                                item.hasGroup = false;
+                                tempList.push_back(item);
+                            }
+                        }
+                    }
 
-						TIME_START(3);
-						for (auto group : list) {
-							if (!group.empty()) {
-								float y = group[0].sPoint.y + -((group.size() / 2) * 15.0f);
-								for (auto [name, sPoint, distance, hasGroup, color] : group) {
-									sPoint.y = y;
-									sPoint.x = group[0].sPoint.x;
-									DrawTextWithOutline(bg, sPoint, std::format("{}m | {}", distance, name->ToString()).c_str(), color, 1, DrawHelp::OutlineSide::All, ImColor{ 0,0,0 });
-									y += 15.0f;
-								}
-							}
-						}
+                    for (size_t i = 0; i < tempList.size(); i++) {
+                        if (tempList[i].hasGroup) {
+                            continue;
+                        }
+                        std::vector<Item> temp;
+                        temp.reserve(tempList.size() - i);
+                        for (size_t j = i + 1; j < tempList.size(); j++) {
+                            if (tempList[j].hasGroup) continue;
+                            if (sqrt(pow(tempList[i].sPoint.x - tempList[j].sPoint.x, 2) + pow(tempList[i].sPoint.y - tempList[j].sPoint.y, 2)) < 150.0f) {
+                                tempList[j].hasGroup = true;
+                                temp.push_back(tempList[j]);
+                            }
+                        }
+                        list.push_back(temp);
+                    }
+
+                    for (auto group : list) {
+                        if (!group.empty()) {
+                            float y = group[0].sPoint.y + -((group.size() / 2) * 15.0f);
+                            for (auto [name, sPoint, distance, hasGroup, color] : group) {
+                                sPoint.y = y;
+                                sPoint.x = group[0].sPoint.x;
+                                DrawTextWithOutline(bg, sPoint, std::format("{}m | {}", distance, name->ToString()).c_str(), color, 1, DrawHelp::OutlineSide::All, ImColor{0, 0, 0});
+                                y += 15.0f;
+                            }
+                        }
+                    }
 
 
-						for (auto [name, sPoint, distance, hasGroup, color] : tempList) {
-							if (!hasGroup) {
-								DrawTextWithOutline(bg, sPoint, std::format("{}m | {}", distance, name->ToString()).c_str(), color, 1, DrawHelp::OutlineSide::All, ImColor{ 0,0,0 });
-							}
-						}
-						TIME_END(3);
-						TIME_UPDATA("ItemEsp::PickItem::draw", 3);
-					}();
-				} __except (EXCEPTION_EXECUTE_HANDLER) {
-					[]() {
-						ERROR("ItemEsp (except)");
-					}();
-				}
-			}();
-			
-		} catch (...) {
-			ERROR("ItemEsp->nullptr")
-		}
+                    for (auto [name, sPoint, distance, hasGroup, color] : tempList) {
+                        if (!hasGroup) {
+                            DrawTextWithOutline(bg, sPoint, std::format("{}m | {}", distance, name->ToString()).c_str(), color, 1, DrawHelp::OutlineSide::All, ImColor{0, 0, 0});
+                        }
+                    }
+
+                }();
+            } __except (EXCEPTION_EXECUTE_HANDLER) {
+                []() {
+                    ERROR("ItemEsp (except)");
+                }();
+            }
+        }();
 	}
 }
 void ItemEsp::Render() {
-	ImGui::Checkbox(reinterpret_cast<const char*>(u8"启用"), &enable);
+	ImGui::Checkbox(("启用"), &enable);
 	if (enable && ImGui::BeginTabBar("List")) {
-		if (ImGui::BeginTabItem(GbkToUtf8("子弹").c_str())) {
+		if (ImGui::BeginTabItem("子弹")) {
 			if (ImGui::BeginTable("List", 2,
 				ImGuiTableFlags_ScrollX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY |
 				ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV |
 				ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable,
 				ImVec2(0.0F, ImGui::GetTextLineHeightWithSpacing() * 8))) {
 				ImGui::TableSetupScrollFreeze(1, 1);
-				ImGui::TableSetupColumn(reinterpret_cast<const char*>(u8"显示"), ImGuiTableColumnFlags_None);
-				ImGui::TableSetupColumn(reinterpret_cast<const char*>(u8"名称"), ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn(("显示"), ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn(("名称"), ImGuiTableColumnFlags_None);
 				ImGui::TableHeadersRow();
 
 				for (auto& [name, info] : itemInfoList) {
-					if (info.group == GbkToUtf8("子弹") && info.type.empty()) {
+					if (info.group == ("子弹") && info.type.empty()) {
 						ImGui::PushID(name.c_str());
 						ImGui::TableNextRow();
 						if (ImGui::TableSetColumnIndex(0)) ImGui::Checkbox("", &info.show);
@@ -130,19 +118,19 @@ void ItemEsp::Render() {
 			ImGui::EndTabItem();
 		}
 
-		if (ImGui::BeginTabItem(GbkToUtf8("配件").c_str())) {
+		if (ImGui::BeginTabItem("配件")) {
 			if (ImGui::BeginTable("List", 2,
 				ImGuiTableFlags_ScrollX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY |
 				ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV |
 				ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable,
 				ImVec2(0.0F, ImGui::GetTextLineHeightWithSpacing() * 8))) {
 				ImGui::TableSetupScrollFreeze(1, 1);
-				ImGui::TableSetupColumn((const char*)u8"显示", ImGuiTableColumnFlags_None);
-				ImGui::TableSetupColumn((const char*)u8"名称", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("显示", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("名称", ImGuiTableColumnFlags_None);
 				ImGui::TableHeadersRow();
 
 				for (auto& [name, info] : itemInfoList) {
-					if (info.group == GbkToUtf8("配件") && info.type.empty()) {
+					if (info.group == ("配件") && info.type.empty()) {
 						ImGui::PushID(name.c_str());
 						ImGui::TableNextRow();
 						if (ImGui::TableSetColumnIndex(0)) ImGui::Checkbox("", &info.show);
@@ -157,19 +145,19 @@ void ItemEsp::Render() {
 			ImGui::EndTabItem();
 		}
 
-		if (ImGui::BeginTabItem(GbkToUtf8("装备").c_str())) {
+		if (ImGui::BeginTabItem("装备")) {
 			if (ImGui::BeginTable("List", 2,
 				ImGuiTableFlags_ScrollX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY |
 				ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV |
 				ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable,
 				ImVec2(0.0F, ImGui::GetTextLineHeightWithSpacing() * 8))) {
 				ImGui::TableSetupScrollFreeze(1, 1);
-				ImGui::TableSetupColumn((const char*)u8"显示", ImGuiTableColumnFlags_None);
-				ImGui::TableSetupColumn((const char*)u8"名称", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("显示", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("名称", ImGuiTableColumnFlags_None);
 				ImGui::TableHeadersRow();
 
 				for (auto& [name, info] : itemInfoList) {
-					if (info.group == GbkToUtf8("装备") && info.type.empty()) {
+					if (info.group == ("装备") && info.type.empty()) {
 						ImGui::PushID(name.c_str());
 						ImGui::TableNextRow();
 						if (ImGui::TableSetColumnIndex(0)) ImGui::Checkbox("", &info.show);
@@ -184,19 +172,19 @@ void ItemEsp::Render() {
 			ImGui::EndTabItem();
 		}
 
-		if (ImGui::BeginTabItem(GbkToUtf8("投掷物").c_str())) {
+		if (ImGui::BeginTabItem(("投掷物"))) {
 			if (ImGui::BeginTable("List", 2,
 				ImGuiTableFlags_ScrollX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY |
 				ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV |
 				ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable,
 				ImVec2(0.0F, ImGui::GetTextLineHeightWithSpacing() * 8))) {
 				ImGui::TableSetupScrollFreeze(1, 1);
-				ImGui::TableSetupColumn((const char*)u8"显示", ImGuiTableColumnFlags_None);
-				ImGui::TableSetupColumn((const char*)u8"名称", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("显示", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("名称", ImGuiTableColumnFlags_None);
 				ImGui::TableHeadersRow();
 
 				for (auto& [name, info] : itemInfoList) {
-					if (info.group == GbkToUtf8("投掷物") && info.type.empty()) {
+					if (info.group == ("投掷物") && info.type.empty()) {
 						ImGui::PushID(name.c_str());
 						ImGui::TableNextRow();
 						if (ImGui::TableSetColumnIndex(0)) ImGui::Checkbox("", &info.show);
@@ -211,19 +199,19 @@ void ItemEsp::Render() {
 			ImGui::EndTabItem();
 		}
 
-		if (ImGui::BeginTabItem(GbkToUtf8("药品").c_str())) {
+		if (ImGui::BeginTabItem(("药品"))) {
 			if (ImGui::BeginTable("List", 2,
 				ImGuiTableFlags_ScrollX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY |
 				ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV |
 				ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable,
 				ImVec2(0.0F, ImGui::GetTextLineHeightWithSpacing() * 8))) {
 				ImGui::TableSetupScrollFreeze(1, 1);
-				ImGui::TableSetupColumn((const char*)u8"显示", ImGuiTableColumnFlags_None);
-				ImGui::TableSetupColumn((const char*)u8"名称", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("显示", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("名称", ImGuiTableColumnFlags_None);
 				ImGui::TableHeadersRow();
 
 				for (auto& [name, info] : itemInfoList) {
-					if (info.group == GbkToUtf8("药品") && info.type.empty()) {
+					if (info.group == ("药品") && info.type.empty()) {
 						ImGui::PushID(name.c_str());
 						ImGui::TableNextRow();
 						if (ImGui::TableSetColumnIndex(0)) ImGui::Checkbox("", &info.show);
@@ -238,19 +226,19 @@ void ItemEsp::Render() {
 			ImGui::EndTabItem();
 		}
 
-		if (ImGui::BeginTabItem(GbkToUtf8("身份卡").c_str())) {
+		if (ImGui::BeginTabItem(("身份卡"))) {
 			if (ImGui::BeginTable("List", 2,
 				ImGuiTableFlags_ScrollX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY |
 				ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV |
 				ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable,
 				ImVec2(0.0F, ImGui::GetTextLineHeightWithSpacing() * 8))) {
 				ImGui::TableSetupScrollFreeze(1, 1);
-				ImGui::TableSetupColumn((const char*)u8"显示", ImGuiTableColumnFlags_None);
-				ImGui::TableSetupColumn((const char*)u8"名称", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("显示", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("名称", ImGuiTableColumnFlags_None);
 				ImGui::TableHeadersRow();
 
 				for (auto& [name, info] : itemInfoList) {
-					if (info.group == GbkToUtf8("身份卡") && info.type.empty()) {
+					if (info.group == ("身份卡") && info.type.empty()) {
 						ImGui::PushID(name.c_str());
 						ImGui::TableNextRow();
 						if (ImGui::TableSetColumnIndex(0)) ImGui::Checkbox("", &info.show);
@@ -265,19 +253,19 @@ void ItemEsp::Render() {
 			ImGui::EndTabItem();
 		}
 
-		if (ImGui::BeginTabItem(GbkToUtf8("其他").c_str())) {
+		if (ImGui::BeginTabItem(("其他"))) {
 			if (ImGui::BeginTable("List", 2,
 				ImGuiTableFlags_ScrollX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY |
 				ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV |
 				ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable,
 				ImVec2(0.0F, ImGui::GetTextLineHeightWithSpacing() * 8))) {
 				ImGui::TableSetupScrollFreeze(1, 1);
-				ImGui::TableSetupColumn((const char*)u8"显示", ImGuiTableColumnFlags_None);
-				ImGui::TableSetupColumn((const char*)u8"名称", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("显示", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("名称", ImGuiTableColumnFlags_None);
 				ImGui::TableHeadersRow();
 
 				for (auto& [name, info] : itemInfoList) {
-					if (info.group == GbkToUtf8("其他") && info.type.empty()) {
+					if (info.group == ("其他") && info.type.empty()) {
 						ImGui::PushID(name.c_str());
 						ImGui::TableNextRow();
 						if (ImGui::TableSetColumnIndex(0)) ImGui::Checkbox("", &info.show);
@@ -292,21 +280,21 @@ void ItemEsp::Render() {
 			ImGui::EndTabItem();
 		}
 
-		if (ImGui::BeginTabItem(GbkToUtf8("武器").c_str())) {
+		if (ImGui::BeginTabItem(("武器"))) {
 			for (auto& typeName : type) {
-				if (ImGui::CollapsingHeader(GbkToUtf8(typeName).c_str())) {
+				if (ImGui::CollapsingHeader((typeName).c_str())) {
 					if (ImGui::BeginTable("List", 2,
 						ImGuiTableFlags_ScrollX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY |
 						ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV |
 						ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable,
 						ImVec2(0.0F, ImGui::GetTextLineHeightWithSpacing() * 8))) {
 						ImGui::TableSetupScrollFreeze(1, 1);
-						ImGui::TableSetupColumn((const char*)u8"显示", ImGuiTableColumnFlags_None);
-						ImGui::TableSetupColumn((const char*)u8"名称", ImGuiTableColumnFlags_None);
+						ImGui::TableSetupColumn("显示", ImGuiTableColumnFlags_None);
+						ImGui::TableSetupColumn("名称", ImGuiTableColumnFlags_None);
 						ImGui::TableHeadersRow();
 
 						for (auto& [name, info] : itemInfoList) {
-							if (info.group == GbkToUtf8("武器") && GbkToUtf8(typeName) == info.type) {
+							if (info.group == ("武器") && (typeName) == info.type) {
 								ImGui::PushID(name.c_str());
 								ImGui::TableNextRow();
 								if (ImGui::TableSetColumnIndex(0)) ImGui::Checkbox("", &info.show);
@@ -320,19 +308,19 @@ void ItemEsp::Render() {
 					}
 				}
 			}
-			if (ImGui::CollapsingHeader(GbkToUtf8("近战").c_str())) {
+			if (ImGui::CollapsingHeader(("近战"))) {
 				if (ImGui::BeginTable("List", 2,
 					ImGuiTableFlags_ScrollX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY |
 					ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV |
 					ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable,
 					ImVec2(0.0F, ImGui::GetTextLineHeightWithSpacing() * 8))) {
 					ImGui::TableSetupScrollFreeze(1, 1);
-					ImGui::TableSetupColumn((const char*)u8"显示", ImGuiTableColumnFlags_None);
-					ImGui::TableSetupColumn((const char*)u8"名称", ImGuiTableColumnFlags_None);
+					ImGui::TableSetupColumn("显示", ImGuiTableColumnFlags_None);
+					ImGui::TableSetupColumn("名称", ImGuiTableColumnFlags_None);
 					ImGui::TableHeadersRow();
 
 					for (auto& [name, info] : itemInfoList) {
-						if (info.group == GbkToUtf8("近战") && info.type.empty()) {
+						if (info.group == ("近战") && info.type.empty()) {
 							ImGui::PushID(name.c_str());
 							ImGui::TableNextRow();
 							if (ImGui::TableSetColumnIndex(0)) ImGui::Checkbox("", &info.show);
@@ -380,10 +368,10 @@ auto ItemEsp::GetInstance() -> ItemEsp* {
 	for (auto& [name, info] : infoList) {
 		ItemInfo item;
 		item.color = info.color;
-		item.group = GbkToUtf8(info.group);
+		item.group = (info.group);
 		item.show = info.show;
-		item.type = GbkToUtf8(info.type);
-		itemInfoList[GbkToUtf8(name)] = item;
+		item.type = (info.type);
+		itemInfoList[(name)] = item;
 	}
 	return &ItemEsp;
 }

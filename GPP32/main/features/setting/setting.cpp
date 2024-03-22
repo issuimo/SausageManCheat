@@ -1,14 +1,14 @@
 ﻿#include "setting.h"
-const Feature::GuiInfo& Setting::GetInfo() const { return *new GuiInfo{ (const char*)u8"设置", (const char*)u8"性能", true, false, false }; };
+const Feature::GuiInfo& Setting::GetInfo() const { return *new GuiInfo{ "设置", "性能", true, false, false }; };
 void Setting::Draw() { Feature::Draw(); }
 void Setting::Render() {
-	ImGui::Text((const char*)u8"数据采样率");
+	ImGui::Text("数据采样率");
 	ImGui::SameLine();
-	ImGui::RadioButton((const char*)u8"10帧", &upDateSpeed, 100);
+	ImGui::RadioButton("5帧", &upDateSpeed, 200);
 	ImGui::SameLine();
-	ImGui::RadioButton((const char*)u8"20帧", &upDateSpeed, 50);
+	ImGui::RadioButton("10帧", &upDateSpeed, 100);
 	ImGui::SameLine();
-	ImGui::RadioButton((const char*)u8"30帧", &upDateSpeed, 32);
+	ImGui::RadioButton("20帧", &upDateSpeed, 50);
 }
 void Setting::Update() { Feature::Update(); }
 void Setting::Save(nlohmann::json& json) {

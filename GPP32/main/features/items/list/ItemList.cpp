@@ -1,19 +1,19 @@
 ﻿#include "ItemList.h"
 #include "../../../GameDefine/PickItem/PickItem.h"
 
-auto ItemList::GetInfo() const -> const GuiInfo& { return *new GuiInfo{ (const char*)u8"物品", (const char*)u8"列表", true, false, false }; }
+auto ItemList::GetInfo() const -> const GuiInfo& { return *new GuiInfo{ "物品", "列表", true, false, false }; }
 void ItemList::Draw() { Feature::Draw(); }
 void ItemList::Render() {
 	std::lock_guard lock(PickItem::mutex);
-	ImGui::Text(GbkToUtf8(std::format("{} 个物品", PickItem::vector.size())).c_str());
+	ImGui::Text((std::format("{} 个物品", PickItem::vector.size())).c_str());
 	if (ImGui::BeginTable("List", 2,
 		ImGuiTableFlags_ScrollX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY |
 		ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV |
 		ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable,
 		ImVec2(0.0F, ImGui::GetTextLineHeightWithSpacing() * 8))) {
 		ImGui::TableSetupScrollFreeze(1, 1);
-		ImGui::TableSetupColumn((const char*)u8"ID", ImGuiTableColumnFlags_None);
-		ImGui::TableSetupColumn((const char*)u8"名称", ImGuiTableColumnFlags_None);
+		ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_None);
+		ImGui::TableSetupColumn("名称", ImGuiTableColumnFlags_None);
 		ImGui::TableHeadersRow();
 
 		for (const auto& obj : PickItem::vector) {
@@ -33,15 +33,15 @@ void ItemList::Render() {
 		ImGui::EndTable();
 	}
 
-	/*ImGui::Text(GbkToUtf8(std::format("{} 个物品", PickItem::allVector.size())).c_str());
+	/*ImGui::Text((std::format("{} 个物品", PickItem::allVector.size())).c_str());
 	if (ImGui::BeginTable("List", 2,
 		ImGuiTableFlags_ScrollX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY |
 		ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV |
 		ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable,
 		ImVec2(0.0F, ImGui::GetTextLineHeightWithSpacing() * 8))) {
 		ImGui::TableSetupScrollFreeze(1, 1);
-		ImGui::TableSetupColumn((const char*)u8"ID", ImGuiTableColumnFlags_None);
-		ImGui::TableSetupColumn((const char*)u8"名称", ImGuiTableColumnFlags_None);
+		ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_None);
+		ImGui::TableSetupColumn("名称", ImGuiTableColumnFlags_None);
 		ImGui::TableHeadersRow();
 
 		for (const auto& obj : PickItem::allVector) {

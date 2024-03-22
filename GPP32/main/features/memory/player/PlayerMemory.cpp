@@ -1,25 +1,25 @@
 ﻿#include "PlayerMemory.h"
 #include "../../../GameDefine/Role/Role.h"
 
-const Feature::GuiInfo& PlayerMemory::GetInfo() const { return *new GuiInfo{ (const char*)u8"内存", (const char*)u8"玩家", true, true, false }; };
+const Feature::GuiInfo& PlayerMemory::GetInfo() const { return *new GuiInfo{ "内存", "玩家", true, true, false }; };
 void PlayerMemory::Draw() { Feature::Draw(); }
 void PlayerMemory::Render() {
 	if (ImGui::BeginTabBar("memList")) {
-		if (ImGui::BeginTabItem((const char*)u8"缩放")) {
-			ImGui::TextColored(ImColor{ 255,0,0 }, (const char*)u8"有较大概率封号");
-			if (ImGui::Button((const char*)u8"重置")) {
+		if (ImGui::BeginTabItem("缩放")) {
+			ImGui::TextColored(ImColor{ 255,0,0 }, "有较大概率封号");
+			if (ImGui::Button("重置")) {
 				scale.v = 1;
 			}
 			ImGui::SameLine();
-			ImGui::Checkbox(reinterpret_cast<const char*>(u8"启用"), &scale.enable);
+			ImGui::Checkbox(("启用"), &scale.enable);
 			if (scale.enable) {
-				ImGui::SliderFloat((const char*)u8"倍", &scale.v, 0.1, 2.5);
+				ImGui::SliderFloat("倍", &scale.v, 0.1, 2.5);
 			}
 
 			ImGui::EndTabItem();
 		}
-		if (ImGui::BeginTabItem((const char*)u8"移动")) {
-			ImGui::Checkbox((const char*)u8"天外飞仙", &enable);
+		if (ImGui::BeginTabItem("移动")) {
+			ImGui::Checkbox("天外飞仙", &enable);
 			ImGui::EndTabItem();
 		}
 		ImGui::EndTabBar();

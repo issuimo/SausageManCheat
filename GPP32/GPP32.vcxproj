@@ -28,14 +28,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <InterproceduralOptimization>true</InterproceduralOptimization>
     <UseInteloneMKL>No</UseInteloneMKL>
     <UseIntelIPP1A>false</UseIntelIPP1A>
     <UseInteloneTBB>false</UseInteloneTBB>
-    <UseMpiLibrary1A>MSMPI</UseMpiLibrary1A>
+    <UseMpiLibrary1A>INTELMPI</UseMpiLibrary1A>
     <BasePlatformToolset>v143</BasePlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -97,16 +97,19 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <ControlFlowGuard>false</ControlFlowGuard>
-      <FloatingPointModel>Precise</FloatingPointModel>
+      <FloatingPointModel>Fast</FloatingPointModel>
       <FloatingPointExceptions>
       </FloatingPointExceptions>
       <GuardEHContMetadata>
       </GuardEHContMetadata>
-      <AssemblerOutput>NoListing</AssemblerOutput>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <AssemblerOutput>All</AssemblerOutput>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions3</EnableEnhancedInstructionSet>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <EnableModules>true</EnableModules>
       <BuildStlModules>true</BuildStlModules>
+      <Optimization>MaxSpeedHighLevel</Optimization>
+      <GenerateAlternateCodePaths>None</GenerateAlternateCodePaths>
+      <UseProcessorExtensions>None</UseProcessorExtensions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -140,6 +143,7 @@
     <ClCompile Include="main\features\camera\list\CameraList.cpp" />
     <ClCompile Include="main\features\items\esp\ItemEsp.cpp" />
     <ClCompile Include="main\features\items\list\ItemList.cpp" />
+    <ClCompile Include="main\features\player\antiAim\AntiAim.cpp" />
     <ClCompile Include="main\features\player\esp\PlayerEsp.cpp" />
     <ClCompile Include="main\features\setting\analyze.cpp" />
     <ClCompile Include="main\features\setting\debug.cpp" />
@@ -175,33 +179,15 @@
     <ClInclude Include="main\features\camera\list\CameraList.h" />
     <ClInclude Include="main\features\items\esp\ItemEsp.h" />
     <ClInclude Include="main\features\items\list\ItemList.h" />
+    <ClInclude Include="main\features\player\antiAim\AntiAim.h" />
     <ClInclude Include="main\features\player\esp\PlayerEsp.h" />
     <ClInclude Include="main\features\setting\analyze.h" />
     <ClInclude Include="main\features\setting\debug.h" />
     <ClInclude Include="main\features\setting\setting.h" />
     <ClInclude Include="main\GameDefine\Animator\AnimatorControl.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\CmdCheckRoleSize.h" />
     <ClInclude Include="main\GameDefine\AntiCheat\InjectionDetectedEventHandler.h" />
     <ClInclude Include="main\GameDefine\AntiCheat\InjectionDetector.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\NetworkServer_GameCheat.h" />
     <ClInclude Include="main\GameDefine\AntiCheat\ObscuredCheatingDetector.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheat.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatAction.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatBullet.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatBulletFireData.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatCar.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatCollider.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatConfig.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatHolySword.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatJump.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatKill.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatMeleeAttackData.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatMove.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatMTP.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatPoint.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatUseItem.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatWave.h" />
-    <ClInclude Include="main\GameDefine\AntiCheat\RoleCheatWeapon.h" />
     <ClInclude Include="main\GameDefine\Camera\CameraMove.hpp" />
     <ClInclude Include="main\GameDefine\Car\Car.h" />
     <ClInclude Include="main\GameDefine\Car\CarNet.h" />
